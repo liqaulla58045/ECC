@@ -1,0 +1,45 @@
+### Node / JS
+node_modules/
+/.pnp/
+.pnp.js
+
+### Environment
+.env
+.env.*
+
+### Output
+dist/
+build/
+out/
+coverage/
+.nyc_output/
+/.next/
+
+### TypeScript
+*.tsbuildinfo
+
+### Logs
+npm-debug.log*
+'yarn-debug.log*'
+'yarn-error.log*'
+pnpm-debug.log*
+*.log
+
+### Editor/IDE
+.vscode/
+.idea/
+.history/
+
+### OS
+.DS_Store
+Thumbs.db
+
+### Test / Playwright
+playwright-report/
+test-results/
+
+### Misc
+.cache/
+/*.local
+/.sass-cache
+/.parcel-cache
