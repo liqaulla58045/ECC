@@ -1,0 +1,190 @@
+/* ══════════════════════════════════════════════
+   PROJECT CARD — Blossom UI Style
+   White Cards + 20px Radius + Orange Accents
+   ══════════════════════════════════════════════ */
+
+.pc-card {
+    background: #FFFFFF;
+    border: 1px solid var(--c-border);
+    border-radius: var(--r-lg);
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    transition: all 0.3s var(--ease);
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    box-shadow: var(--shadow-md);
+}
+
+.pc-card:hover {
+    transform: translateY(-4px);
+    border-color: var(--c-accent);
+    box-shadow: var(--shadow-lg);
+}
+
+.pc-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.pc-title-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.pc-name {
+    font-family: var(--font-display);
+    font-size: 1.15rem;
+    font-weight: 800;
+    color: var(--c-text);
+    letter-spacing: -0.01em;
+}
+
+.pc-category {
+    font-size: 0.75rem;
+    color: var(--c-text-3);
+    text-transform: uppercase;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+}
+
+/* ─── STATUS BADGES ─── */
+.pc-status {
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+
+.pc-status--active {
+    background: var(--c-green-bg);
+    color: var(--c-green);
+}
+
+.pc-status--planning {
+    background: var(--c-amber-bg);
+    color: var(--c-amber);
+}
+
+/* ─── METRICS ─── */
+.pc-metrics {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+    padding: 16px;
+    background: var(--c-bg);
+    border-radius: var(--r-md);
+    border: 1px solid var(--c-border);
+}
+
+.pc-metric-item {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.pc-metric-label {
+    font-size: 0.7rem;
+    color: var(--c-text-3);
+    font-weight: 600;
+}
+
+.pc-metric-val {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--c-text);
+}
+
+/* ─── PROGRESS ─── */
+.pc-progress-section {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.pc-progress-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.pc-progress-label {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--c-text-2);
+}
+
+.pc-progress-pct {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--c-accent);
+}
+
+.pc-progress-bar-bg {
+    height: 8px;
+    background: var(--c-raised);
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.pc-progress-bar-fill {
+    height: 100%;
+    background: var(--c-accent);
+    /* Blossom Orange */
+    border-radius: 4px;
+    transition: width 1s var(--ease);
+}
+
+/* ─── FOOTER ─── */
+.pc-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 4px;
+    padding-top: 16px;
+    border-top: 1px solid var(--c-border);
+}
+
+.pc-team {
+    display: flex;
+    align-items: center;
+}
+
+.pc-team-avatar {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    border: 2px solid #FFFFFF;
+    margin-left: -8px;
+    background: var(--c-raised);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.6rem;
+    font-weight: 700;
+    color: var(--c-text-2);
+}
+
+.pc-team-avatar:first-child {
+    margin-left: 0;
+}
+
+.pc-view-btn {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--c-accent);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    transition: gap 0.2s;
+}
+
+.pc-card:hover .pc-view-btn {
+    gap: 8px;
+}

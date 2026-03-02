@@ -1,0 +1,364 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+/* ─────────────────────────────────────────────
+   DESIGN SYSTEM — WARM LIGHT
+───────────────────────────────────────────── */
+:root {
+  /* Base - Blossom Neutrals */
+  --c-bg: #F8F8F8;
+  --c-surface: #FFFFFF;
+  --c-raised: #F1F1F1;
+  --c-overlay: #EBEBEB;
+
+  /* Borders - Softer */
+  --c-border: rgba(0, 0, 0, 0.05);
+  --c-border-md: rgba(0, 0, 0, 0.10);
+  --c-border-hi: rgba(0, 0, 0, 0.18);
+
+  /* Text - High Contrast */
+  --c-text: #111111;
+  --c-text-2: #555555;
+  --c-text-3: #999999;
+
+  /* Accent — Blossom Orange */
+  --c-accent: #D14931;
+  --c-accent-2: #E85A42;
+  --c-accent-bg: rgba(209, 73, 49, 0.05);
+  --c-accent-bd: rgba(209, 73, 49, 0.15);
+
+  /* Semantic - Blossom Palette */
+  --c-green: #2B8A3E;
+  --c-green-bg: rgba(43, 138, 62, 0.08);
+  --c-amber: #E67E22;
+  --c-amber-bg: rgba(230, 126, 34, 0.08);
+  --c-red: #D14931;
+  --c-red-bg: rgba(209, 73, 49, 0.08);
+  --c-blue: #1C7ED6;
+  --c-blue-bg: rgba(28, 126, 214, 0.08);
+
+  /* Shadows - Blossom Minimal */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.05);
+  --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.06);
+  --shadow-xl: 0 20px 48px rgba(0, 0, 0, 0.08);
+
+  /* Typography */
+  --font-display: 'Plus Jakarta Sans', sans-serif;
+  --font-body: 'Inter', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+
+  /* Radii - Blossom Modern */
+  --r-sm: 8px;
+  --r-md: 12px;
+  --r-lg: 20px;
+  --r-xl: 28px;
+
+  /* Easing */
+  --ease: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-out: cubic-bezier(0, 0, 0.2, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* ─────────────────────────────────────────────
+   RESET
+───────────────────────────────────────────── */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-body);
+  background: var(--c-bg);
+  color: var(--c-text);
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  overflow-x: hidden;
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+button {
+  cursor: pointer;
+  font-family: inherit;
+}
+
+input,
+textarea,
+select {
+  font-family: inherit;
+}
+
+::-webkit-scrollbar {
+  width: 5px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--c-raised);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--c-border-hi);
+  border-radius: 3px;
+}
+
+/* ─────────────────────────────────────────────
+   BUTTONS
+───────────────────────────────────────────── */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 0 18px;
+  height: 38px;
+  border-radius: var(--r-sm);
+  font-family: var(--font-body);
+  font-size: 0.82rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  border: none;
+  transition: all 0.18s var(--ease);
+  white-space: nowrap;
+}
+
+.btn-solid {
+  background: var(--c-accent);
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(79, 70, 229, 0.22);
+}
+
+.btn-solid:hover {
+  background: var(--c-accent-2);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(79, 70, 229, 0.28);
+}
+
+.btn-solid:active {
+  transform: translateY(0);
+}
+
+.btn-ghost {
+  background: transparent;
+  color: var(--c-text-2);
+  border: 1px solid var(--c-border-md);
+}
+
+.btn-ghost:hover {
+  border-color: var(--c-border-hi);
+  color: var(--c-text);
+  background: var(--c-raised);
+}
+
+.btn-subtle {
+  background: var(--c-raised);
+  color: var(--c-text-2);
+  border: 1px solid var(--c-border);
+}
+
+.btn-subtle:hover {
+  background: var(--c-overlay);
+  color: var(--c-text);
+}
+
+/* ─────────────────────────────────────────────
+   BADGES
+───────────────────────────────────────────── */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 9px;
+  border-radius: 20px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.badge-active {
+  background: var(--c-green-bg);
+  color: var(--c-green);
+}
+
+.badge-plan {
+  background: var(--c-amber-bg);
+  color: var(--c-amber);
+}
+
+.badge-red {
+  background: var(--c-red-bg);
+  color: var(--c-red);
+}
+
+.badge-blue {
+  background: var(--c-blue-bg);
+  color: var(--c-blue);
+}
+
+.badge-accent {
+  background: var(--c-accent-bg);
+  color: var(--c-accent);
+}
+
+/* ─────────────────────────────────────────────
+   ANIMATIONS
+───────────────────────────────────────────── */
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(40px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(22px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes chatBubble {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.96);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes pulse {
+
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.4;
+  }
+}
+
+@keyframes draw-ring {
+  from {
+    stroke-dashoffset: 880;
+  }
+
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes draw-line {
+  from {
+    stroke-dashoffset: 1000;
+  }
+
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+.anim-fade-up {
+  animation: fadeUp 0.42s var(--ease-out) both;
+}
+
+.anim-fade-in {
+  animation: fadeIn 0.32s var(--ease-out) both;
+}
+
+.anim-scale-in {
+  animation: scaleIn 0.28s var(--ease-spring) both;
+}
+
+.anim-slide-r {
+  animation: slideInRight 0.32s var(--ease-out) both;
+}
+
+.anim-slide-up {
+  animation: slideUp 0.38s var(--ease-spring) both;
+}
+
+.delay-1 {
+  animation-delay: 0.06s;
+}
+
+.delay-2 {
+  animation-delay: 0.12s;
+}
+
+.delay-3 {
+  animation-delay: 0.18s;
+}
+
+.delay-4 {
+  animation-delay: 0.24s;
+}
+
+.delay-5 {
+  animation-delay: 0.30s;
+}
