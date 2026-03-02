@@ -580,10 +580,10 @@ app.post('/api/projects', async (req, res) => {
     }
 });
 
-app.get('/api/projects/:id/proxy/*', async (req, res) => {
+app.get(/^\/api\/projects\/([^\/]+)\/proxy\/(.*)/, async (req, res) => {
     try {
-        const projectId = req.params.id;
-        const targetPath = '/' + (req.params as any)[0];
+        const projectId = (req.params as any)[0];
+        const targetPath = '/' + (req.params as any)[1];
         console.error(`=> Proxy Request for Project ${projectId}: ${targetPath}`);
         const data = await apiGet(targetPath, projectId);
         res.json(data);
@@ -594,7 +594,7 @@ app.get('/api/projects/:id/proxy/*', async (req, res) => {
 });
 
 // Proxy all other /api/* requests to the default initial fallback project
-app.use('/api', async (req, res) => {
+app.all(/^\/api\/(.*)/, async (req, res) => {
     try {
         const id = Array.from(sessions.keys())[0];
         if (!id) {
@@ -602,7 +602,7 @@ app.use('/api', async (req, res) => {
             return;
         }
 
-        const path = req.originalUrl;
+        const path = '/' + (req.params as any)[0];
         console.error(`=> Frontend API Request: ${path}`);
         const data = await apiGet(path, id);
         res.json(data);

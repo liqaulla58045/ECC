@@ -50,7 +50,7 @@ async function askClaude(messageHistory, userText) {
     messages.push({ role: 'user', content: userText });
 
     try {
-        const res = await fetch('/api/anthropic/v1/messages', {
+        const res = await fetch('/claude-api/v1/messages', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -59,7 +59,7 @@ async function askClaude(messageHistory, userText) {
                 'anthropic-dangerous-direct-browser-access': 'true'
             },
             body: JSON.stringify({
-                model: 'claude-3-haiku-20240307',
+                model: 'claude-3-5-sonnet-20240620',
                 max_tokens: 400,
                 system: SV_CONTEXT,
                 messages: messages
