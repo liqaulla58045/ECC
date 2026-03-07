@@ -580,34 +580,47 @@ app.post('/api/projects', async (req, res) => {
     }
 });
 
-app.get('/api/projects/:id/proxy/*', async (req, res) => {
-    try {
-        const projectId = req.params.id;
-        const targetPath = '/' + (req.params as any)[0];
-        console.error(`=> Proxy Request for Project ${projectId}: ${targetPath}`);
-        const data = await apiGet(targetPath, projectId);
-        res.json(data);
-    } catch (err: any) {
-        console.error(`❌ Proxy Error:`, err.message);
-        res.status(500).json({ error: err.message });
-    }
-});
-
-// Proxy all other /api/* requests to the default initial fallback project
+// Consolidated API handler for both general and project-specific proxy requests
 app.use('/api', async (req, res) => {
+    console.error('🔥 app.use(/api) TRIGGERED for:', req.originalUrl, 'Method:', req.method);
     try {
-        const id = Array.from(sessions.keys())[0];
-        if (!id) {
-            res.status(401).json({ error: "Missing SV_EMAIL or SV_PASSWORD in backend .env file. Please configure to view real data." });
+        // req.path will contain the remainder of the path, e.g. '/projects/default-sv/proxy/api/admin/stats'
+        // Remove leading slash if present
+        let fullPath = req.path;
+        console.error('🔥 path is', fullPath);
+        if (fullPath.startsWith('/')) fullPath = fullPath.substring(1);
+
+        // Determine if this is a project-specific proxy or a general fallback
+        // Pattern: projects/:projectId/proxy/:targetPath
+        const proxyMatch = fullPath.match(/^projects\/([^\/]+)\/proxy\/(.*)/);
+
+        let projectId: string | undefined;
+        let targetPath: string;
+
+        if (proxyMatch) {
+            projectId = proxyMatch[1];
+            targetPath = '/' + proxyMatch[2];
+        } else {
+            // Default to the first active session
+            projectId = Array.from(sessions.keys())[0];
+            targetPath = '/api/' + fullPath;
+        }
+
+        console.error('🔥 projectId:', projectId, 'target:', targetPath);
+
+        if (!projectId || !sessions.has(projectId)) {
+            res.status(401).json({
+                error: "Session not found or missing credentials. Please check your .env file.",
+                requestedProject: projectId
+            });
             return;
         }
 
-        const path = req.originalUrl;
-        console.error(`=> Frontend API Request: ${path}`);
-        const data = await apiGet(path, id);
+        console.error(`=> API Request [${projectId}]: ${targetPath}`);
+        const data = await apiGet(targetPath, projectId);
         res.json(data);
     } catch (err: any) {
-        console.error(`❌ Frontend API Error (${req.originalUrl}):`, err.message);
+        console.error(`❌ API Error (${req.originalUrl}):`, err.message);
         res.status(500).json({ error: err.message });
     }
 });

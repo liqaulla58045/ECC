@@ -7,10 +7,10 @@ export default defineConfig({
   envDir: '../',
   server: {
     proxy: {
-      '/api/anthropic': {
+      '/claude-api': {
         target: 'https://api.anthropic.com',
         changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api\/anthropic/, ''),
+        rewrite: (path) => path.replace(/^\/claude-api/, ''),
       },
       '/api': {
         target: 'http://localhost:3001',

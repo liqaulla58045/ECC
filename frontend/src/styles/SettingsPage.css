@@ -1,0 +1,274 @@
+.settings-root {
+    padding: 24px 0;
+    max-width: 1000px;
+}
+
+.settings-header {
+    margin-bottom: 40px;
+}
+
+.settings-title {
+    font-size: 2.2rem;
+    font-weight: 800;
+    color: var(--c-text);
+    margin: 0 0 8px 0;
+}
+
+.settings-subtitle {
+    color: var(--c-text-3);
+    font-size: 1rem;
+}
+
+.settings-container {
+    display: grid;
+    grid-template-columns: 240px 1fr;
+    gap: 48px;
+    align-items: start;
+}
+
+/* ─── SETTINGS NAV ─── */
+.settings-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.settings-nav-item {
+    text-align: left;
+    padding: 12px 16px;
+    background: transparent;
+    border: none;
+    border-radius: 12px;
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--c-text-2);
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.settings-nav-item:hover {
+    background: var(--c-bg);
+    color: var(--c-text);
+}
+
+.settings-nav-item.active {
+    background: var(--c-accent-bg);
+    color: var(--c-accent);
+}
+
+/* ─── CONTENT AREA ─── */
+.settings-content {
+    background: #FFFFFF;
+    border: 1px solid var(--c-border);
+    border-radius: 24px;
+    padding: 40px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.03);
+}
+
+.section-title {
+    font-size: 1.5rem;
+    font-weight: 800;
+    margin-bottom: 32px;
+}
+
+.profile-card {
+    display: flex;
+    gap: 40px;
+}
+
+.profile-avatar-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+}
+
+.profile-avatar {
+    width: 100px;
+    height: 100px;
+    border-radius: 32px;
+    background: var(--c-accent-bg);
+    color: var(--c-accent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    font-weight: 900;
+}
+
+.avatar-edit-btn {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--c-accent);
+    background: transparent;
+    border: none;
+    cursor: pointer;
+}
+
+.profile-form {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.form-group label {
+    font-size: 0.8rem;
+    font-weight: 800;
+    color: var(--c-text-3);
+    text-transform: uppercase;
+}
+
+.form-group input,
+.form-group textarea {
+    padding: 12px 16px;
+    border: 1px solid var(--c-border);
+    border-radius: 10px;
+    font-size: 1rem;
+    background: var(--c-bg);
+    transition: all 0.2s;
+}
+
+.form-group input:focus {
+    border-color: var(--c-accent);
+    background: #FFF;
+    outline: none;
+    box-shadow: 0 0 0 4px var(--c-accent-bg);
+}
+
+/* ─── THEME GRID ─── */
+.theme-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 20px;
+    margin-bottom: 40px;
+}
+
+.theme-card {
+    border: 2px solid var(--c-border);
+    border-radius: 16px;
+    padding: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: center;
+}
+
+.theme-card:hover {
+    border-color: var(--theme-color);
+}
+
+.theme-card.active {
+    border-color: var(--theme-color);
+    background: var(--c-bg);
+}
+
+.theme-preview {
+    height: 80px;
+    border-radius: 8px;
+    margin-bottom: 12px;
+    position: relative;
+    overflow: hidden;
+    border: 1px solid var(--c-border);
+}
+
+.preview-accent {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 12px;
+}
+
+.theme-name {
+    font-size: 0.9rem;
+    font-weight: 700;
+}
+
+/* ─── TOGGLE SWITCH ─── */
+.notifications-list {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.notif-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.notif-label {
+    display: block;
+    font-weight: 700;
+    margin-bottom: 4px;
+}
+
+.notif-desc {
+    font-size: 0.85rem;
+    color: var(--c-text-3);
+}
+
+.toggle-switch {
+    width: 48px;
+    height: 24px;
+    background: var(--c-border);
+    border-radius: 24px;
+    position: relative;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.toggle-switch.on {
+    background: var(--c-green);
+}
+
+.toggle-knob {
+    width: 20px;
+    height: 20px;
+    background: #FFF;
+    border-radius: 50%;
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.toggle-switch.on .toggle-knob {
+    left: 26px;
+}
+
+.settings-actions {
+    margin-top: 48px;
+    padding-top: 32px;
+    border-top: 1px solid var(--c-border);
+    display: flex;
+    gap: 16px;
+}
+
+.settings-save {
+    padding: 12px 32px !important;
+    font-weight: 800 !important;
+}
+
+/* ─── ANIMATIONS ─── */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(12px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.anim-slide-up {
+    animation: fadeInUp 0.5s ease both;
+}

@@ -1,9 +1,12 @@
+import { useState } from 'react';
 import { useLocation, useNavigate, Outlet } from 'react-router-dom';
 import '../styles/DashboardPage.css';
 
 export default function Layout() {
     const navigate = useNavigate();
     const location = useLocation();
+    const [isCollapsed, setIsCollapsed] = useState(true);
+    const [isHovered, setIsHovered] = useState(false);
 
     const getFormattedDate = () => {
         return new Date().toLocaleDateString('en-GB', {
@@ -48,60 +51,80 @@ export default function Layout() {
     ];
 
     return (
-        <div className="db-layout anim-fade-in">
+        <div className={`db-layout ${(isCollapsed && !isHovered) ? 'collapsed' : ''} anim-fade-in`}>
             {/* Sidebar */}
-            <aside className="db-sidebar">
+            <aside
+                className="db-sidebar"
+                onMouseEnter={() => setIsHovered(true)}
+                onMouseLeave={() => setIsHovered(false)}
+            >
                 <div className="db-sidebar-header">
-                    <svg viewBox="0 0 24 24" className="db-sidebar-logo">
-                        <path d="M12 3L1 9L12 15L23 9L12 3Z" fill="currentColor" />
-                        <path d="M1 14L12 20L23 14" stroke="currentColor" strokeWidth="2" fill="none" />
-                    </svg>
-                    <span className="db-sidebar-brand">Logo</span>
+                    <div className="db-sidebar-toggle" onClick={() => setIsCollapsed(!isCollapsed)}>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+                            <line x1="9" y1="3" x2="9" y2="21" />
+                        </svg>
+                    </div>
+                    <div className="db-sidebar-brand-group">
+                        <span className="db-sidebar-logo-icon">🌸</span>
+                        <span className="db-sidebar-brand">Blossom</span>
+                    </div>
                 </div>
 
                 <div className="db-sidebar-profile">
                     <div className="db-sidebar-avatar">
-                        <img src="https://ui-avatars.com/api/?name=John+Doe&background=E8F0FE&color=2C3E50" alt="Avatar" />
+                        <img src="https://ui-avatars.com/api/?name=John+Wick&background=D14931&color=fff" alt="Avatar" />
                     </div>
                     <div className="db-sidebar-meta">
-                        <span className="db-sidebar-role">Chairman</span>
+                        <div className="db-sidebar-role-badge">UIUX Designer</div>
                         <div className="db-sidebar-name">
-                            JOHN D.
+                            John Wick
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="db-sidebar-chev">
-                                <polyline points="6 9 12 15 18 9"></polyline>
+                                <polyline points="7 10 12 15 17 10"></polyline>
                             </svg>
                         </div>
                     </div>
                 </div>
 
-                <nav className="db-sidebar-nav">
-                    {navItems.map(item => (
-                        <div
-                            key={item.path}
-                            className={`db-sidebar-link ${location.pathname.startsWith(item.path) ? 'active' : ''}`}
-                            onClick={() => navigate(item.path)}
-                        >
-                            {item.icon}
-                            <span>{item.label}</span>
-                        </div>
-                    ))}
-                </nav>
+                <div className="db-sidebar-nav">
+                    <div className="db-nav-section">
+                        {navItems.map(item => (
+                            <div
+                                key={item.path}
+                                className={`db-sidebar-link ${location.pathname.startsWith(item.path) ? 'active' : ''}`}
+                                onClick={() => navigate(item.path)}
+                                title={isCollapsed ? item.label : ''}
+                            >
+                                <span className="db-sidebar-icon-wrapper">{item.icon}</span>
+                                <span>{item.label}</span>
+                            </div>
+                        ))}
+                    </div>
+
+                </div>
 
                 <div className="db-sidebar-bottom">
-                    <div className="db-sidebar-link">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="db-sidebar-icon">
-                            <circle cx="12" cy="12" r="3"></circle>
-                            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
-                        </svg>
+                    <div
+                        className={`db-sidebar-link ${location.pathname === '/settings' ? 'active' : ''}`}
+                        onClick={() => navigate('/settings')}
+                    >
+                        <span className="db-sidebar-icon-wrapper">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="db-sidebar-icon">
+                                <circle cx="12" cy="12" r="3"></circle>
+                                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+                            </svg>
+                        </span>
                         <span>Settings</span>
                     </div>
                     <div className="db-sidebar-link" onClick={() => navigate('/')}>
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="db-sidebar-icon">
-                            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
-                            <polyline points="16 17 21 12 16 7"></polyline>
-                            <line x1="21" y1="12" x2="9" y2="12"></line>
-                        </svg>
-                        <span>Logout</span>
+                        <span className="db-sidebar-icon-wrapper">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="db-sidebar-icon">
+                                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                                <polyline points="16 17 21 12 16 7"></polyline>
+                                <line x1="21" y1="12" x2="9" y2="12"></line>
+                            </svg>
+                        </span>
+                        <span>Log Out</span>
                     </div>
                 </div>
             </aside>
