@@ -6,22 +6,22 @@
 .pc-card {
     background: #FFFFFF;
     border: 1px solid var(--c-border);
-    border-radius: var(--r-lg);
+    border-radius: 20px;
     padding: 24px;
     display: flex;
     flex-direction: column;
-    gap: 20px;
-    transition: all 0.3s var(--ease);
+    gap: 16px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     cursor: pointer;
     position: relative;
     overflow: hidden;
-    box-shadow: var(--shadow-md);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
 }
 
 .pc-card:hover {
     transform: translateY(-4px);
     border-color: var(--c-accent);
-    box-shadow: var(--shadow-lg);
+    box-shadow: 0 12px 24px rgba(209, 73, 49, 0.08);
 }
 
 .pc-header {
@@ -32,54 +32,84 @@
 
 .pc-title-wrap {
     display: flex;
-    flex-direction: column;
-    gap: 4px;
+    align-items: center;
+    gap: 12px;
+}
+
+.pc-project-avatar {
+    width: 44px;
+    height: 44px;
+    background: var(--c-accent-bg);
+    color: var(--c-accent);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    font-weight: 800;
 }
 
 .pc-name {
     font-family: var(--font-display);
-    font-size: 1.15rem;
+    font-size: 1.1rem;
     font-weight: 800;
     color: var(--c-text);
     letter-spacing: -0.01em;
+    margin: 0;
 }
 
 .pc-category {
-    font-size: 0.75rem;
+    font-size: 0.7rem;
     color: var(--c-text-3);
     text-transform: uppercase;
-    font-weight: 700;
+    font-weight: 800;
     letter-spacing: 0.05em;
 }
 
 /* ─── STATUS BADGES ─── */
 .pc-status {
-    padding: 4px 12px;
-    border-radius: 20px;
-    font-size: 0.7rem;
-    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: 8px;
+    font-size: 0.65rem;
+    font-weight: 800;
     text-transform: uppercase;
     letter-spacing: 0.03em;
 }
 
 .pc-status--active {
-    background: var(--c-green-bg);
-    color: var(--c-green);
+    background: #ECFDF5;
+    color: #10B981;
 }
 
 .pc-status--planning {
-    background: var(--c-amber-bg);
-    color: var(--c-amber);
+    background: #FFFBEB;
+    color: #F59E0B;
+}
+
+.pc-status--error {
+    background: #FEF2F2;
+    color: #EF4444;
+}
+
+.pc-description {
+    font-size: 0.85rem;
+    color: var(--c-text-2);
+    line-height: 1.5;
+    margin: 0;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
 }
 
 /* ─── METRICS ─── */
 .pc-metrics {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 16px;
-    padding: 16px;
-    background: var(--c-bg);
-    border-radius: var(--r-md);
+    gap: 12px;
+    padding: 14px;
+    background: #F8FAFC;
+    border-radius: 12px;
     border: 1px solid var(--c-border);
 }
 
@@ -90,14 +120,18 @@
 }
 
 .pc-metric-label {
-    font-size: 0.7rem;
+    font-size: 0.65rem;
     color: var(--c-text-3);
-    font-weight: 600;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    text-transform: uppercase;
 }
 
 .pc-metric-val {
-    font-size: 1rem;
-    font-weight: 700;
+    font-size: 0.95rem;
+    font-weight: 800;
     color: var(--c-text);
 }
 
@@ -106,6 +140,7 @@
     display: flex;
     flex-direction: column;
     gap: 8px;
+    margin-top: 4px;
 }
 
 .pc-progress-meta {
@@ -115,30 +150,29 @@
 }
 
 .pc-progress-label {
-    font-size: 0.8rem;
-    font-weight: 600;
+    font-size: 0.75rem;
+    font-weight: 700;
     color: var(--c-text-2);
 }
 
 .pc-progress-pct {
-    font-size: 0.8rem;
-    font-weight: 700;
+    font-size: 0.75rem;
+    font-weight: 800;
     color: var(--c-accent);
 }
 
 .pc-progress-bar-bg {
-    height: 8px;
-    background: var(--c-raised);
-    border-radius: 4px;
+    height: 6px;
+    background: #EDF2F7;
+    border-radius: 3px;
     overflow: hidden;
 }
 
 .pc-progress-bar-fill {
     height: 100%;
     background: var(--c-accent);
-    /* Blossom Orange */
-    border-radius: 4px;
-    transition: width 1s var(--ease);
+    border-radius: 3px;
+    transition: width 1s ease-out;
 }
 
 /* ─── FOOTER ─── */
@@ -148,7 +182,7 @@
     align-items: center;
     margin-top: 4px;
     padding-top: 16px;
-    border-top: 1px solid var(--c-border);
+    border-top: 1px dashed var(--c-border);
 }
 
 .pc-team {
@@ -157,18 +191,19 @@
 }
 
 .pc-team-avatar {
-    width: 24px;
-    height: 24px;
+    width: 28px;
+    height: 28px;
     border-radius: 50%;
     border: 2px solid #FFFFFF;
-    margin-left: -8px;
+    margin-left: -10px;
     background: var(--c-raised);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 0.6rem;
-    font-weight: 700;
+    font-size: 0.7rem;
+    font-weight: 800;
     color: var(--c-text-2);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
 .pc-team-avatar:first-child {
@@ -176,15 +211,15 @@
 }
 
 .pc-view-btn {
-    font-size: 0.75rem;
-    font-weight: 700;
+    font-size: 0.8rem;
+    font-weight: 800;
     color: var(--c-accent);
     display: flex;
     align-items: center;
     gap: 4px;
-    transition: gap 0.2s;
+    transition: all 0.2s;
 }
 
 .pc-card:hover .pc-view-btn {
-    gap: 8px;
+    transform: translateX(4px);
 }

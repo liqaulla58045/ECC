@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import LoginPage from './pages/LoginPage';
 import DashboardPage from './pages/DashboardPage';
 import ProjectDetailPage from './pages/ProjectDetailPage';
+import SettingsPage from './pages/SettingsPage';
 import ChatBot from './components/ChatBot';
 import Layout from './components/Layout';
 
@@ -14,10 +15,9 @@ function AppRoutes() {
       <Route element={<Layout />}>
         <Route path="/dashboard" element={<DashboardPage />} />
         <Route path="/ai-assistant" element={<ChatBot />} />
-        {/* Reports can also go here later */}
+        <Route path="/project/:id" element={<ProjectDetailPage />} />
+        <Route path="/settings" element={<SettingsPage />} />
       </Route>
-
-      <Route path="/project/:id" element={<ProjectDetailPage />} />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );

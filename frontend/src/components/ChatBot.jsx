@@ -184,7 +184,7 @@ export default function ChatBot() {
                                 value={input}
                                 onChange={e => setInput(e.target.value)}
                                 onKeyDown={handleKey}
-                                rows={3}
+                                rows={2}
                             />
                             <div className="cb-landing-input-actions">
                                 <div className="cb-landing-input-left">

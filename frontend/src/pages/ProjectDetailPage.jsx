@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import AddProductModal from '../components/AddProductModal';
+// import AddProductModal from '../components/AddProductModal';
 import '../styles/ProjectDetailPage.css';
 
 export default function ProjectDetailPage() {
@@ -134,6 +134,14 @@ export default function ProjectDetailPage() {
                         stipendsDisbursed: '₹4.2L', // Placeholder
                         placementRate: '94%' // Placeholder
                     },
+                    healthScore: 94,
+                    riskLevel: 'Low',
+                    recentActivities: [
+                        { id: 1, type: 'milestone', text: 'Incubation Phase 1 Completed', time: '2 days ago' },
+                        { id: 2, type: 'team', text: '3 New Teams Onboarded', time: '4 days ago' },
+                        { id: 3, type: 'mentor', text: 'Global Mentorship Session held', time: '1 week ago' }
+                    ],
+                    liveUrl: 'https://example.com/demo', // Placeholder live URL
                     products: productsList,
                     team: [
                         { name: 'Dr. Rajesh Kumar', role: 'Chairman', avatar: 'RK' },
@@ -174,12 +182,12 @@ export default function ProjectDetailPage() {
     useEffect(() => { setAnimKey(k => k + 1); }, [activeTab]);
 
     if (loading) {
-        return <div className="pdp-root" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh' }}>Loading cohort data...</div>;
+        return <div className="pd-root" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh' }}>Loading cohort data...</div>;
     }
 
     if (error === '401_UNAUTHORIZED') {
         return (
-            <div className="pdp-root" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh', padding: '2rem' }}>
+            <div className="pd-root" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh', padding: '2rem' }}>
                 <div style={{ background: 'var(--c-surface)', padding: '2rem', borderRadius: '16px', maxWidth: '500px', textAlign: 'center', border: '1px solid var(--c-border)', boxShadow: '0 8px 32px var(--c-shadow)' }}>
                     <svg viewBox="0 0 24 24" fill="none" stroke="var(--c-accent)" strokeWidth="2" width="48" height="48" style={{ marginBottom: '1rem' }}>
                         <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
@@ -204,7 +212,7 @@ export default function ProjectDetailPage() {
     const { kpis } = project;
 
     return (
-        <div className="pdp-root anim-fade-in">
+        <div className="pdp-root">
             {/* Sticky Nav */}
             <nav className="pdp-nav">
                 <button className="pdp-back" onClick={() => navigate('/dashboard')}>
@@ -218,18 +226,29 @@ export default function ProjectDetailPage() {
                     <span className="pdp-nav-status">{project.status}</span>
                     <span className="pdp-nav-cat">{project.category}</span>
                 </div>
-                <button className="btn btn-solid pdp-add-btn" onClick={() => setIsAddProductOpen(true)}>+ Connect Project</button>
+                <div className="pdp-nav-actions">
+                    <button className="btn btn-subtle icon-btn" title="Share">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="16" height="16">
+                            <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8M16 6l-4-4-4 4M12 2v13" />
+                        </svg>
+                    </button>
+                    <button className="btn btn-subtle icon-btn" title="Settings">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="16" height="16">
+                            <circle cx="12" cy="12" r="3" />
+                            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" />
+                        </svg>
+                    </button>
+                </div>
             </nav>
 
-            {/* Hero */}
-            <header className="pdp-hero" style={{ '--pdp-accent': accent }}>
-                <div className="pdp-hero-inner">
-                    <div className="pdp-hero-left">
-                        <div className="pdp-hero-cat anim-slide-up">{project.category}</div>
-                        <h1 className="pdp-hero-title anim-slide-up delay-1">{project.name}</h1>
-                        <p className="pdp-hero-desc anim-slide-up delay-2">{project.description}</p>
-                        <div className="pdp-hero-dates anim-fade-up delay-3">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="14" height="14">
+            {/* Hero Section */}
+            <header className="pd-hero-new" style={{ '--pd-accent': accent }}>
+                <div className="pd-hero-info">
+                    <h1 className="pd-title anim-slide-up delay-1">{project.name}</h1>
+                    <p className="pd-subtitle anim-slide-up delay-2">{project.description}</p>
+                    <div className="pd-hero-meta anim-slide-up delay-3">
+                        <div className="pd-hero-dates">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="18" height="18">
                                 <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
                                 <line x1="16" y1="2" x2="16" y2="6"></line>
                                 <line x1="8" y1="2" x2="8" y2="6"></line>
@@ -237,11 +256,29 @@ export default function ProjectDetailPage() {
                             </svg>
                             {project.startDate} &mdash; {project.endDate}
                         </div>
+                        <div className="pd-hero-actions-row">
+                            <a
+                                href={project.liveUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="btn btn-solid pd-live-btn"
+                            >
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="18" height="18" style={{ marginRight: '8px' }}>
+                                    <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                                    <polyline points="15 3 21 3 21 9"></polyline>
+                                    <line x1="10" y1="14" x2="21" y2="3"></line>
+                                </svg>
+                                Live Demo
+                            </a>
+                            <button className="btn btn-subtle">View Repository</button>
+                        </div>
                     </div>
+                </div>
 
-                    <div className="pdp-hero-right anim-scale-in delay-3">
-                        <div className="pdp-ring-wrap">
-                            <svg className="pdp-ring-svg" viewBox="0 0 100 100">
+                <div className="pd-hero-visuals anim-slide-up delay-3">
+                    <div className="pd-hero-vitals-card">
+                        <div className="pd-ring-wrap">
+                            <svg className="pd-ring-svg" viewBox="0 0 100 100" style={{ transform: 'rotate(-90deg)', width: '100%', height: '100%' }}>
                                 <circle cx="50" cy="50" r="44" fill="none" stroke="var(--c-raised)" strokeWidth="6" />
                                 <circle
                                     cx="50" cy="50" r="44" fill="none"
@@ -249,31 +286,43 @@ export default function ProjectDetailPage() {
                                     strokeLinecap="round"
                                     strokeDasharray="276.46"
                                     strokeDashoffset={276.46 - (276.46 * project.progress) / 100}
-                                    transform="rotate(-90 50 50)"
-                                    style={{ animation: 'draw-ring 1.5s var(--ease-spring) 0.5s both' }}
+                                    style={{ transition: 'stroke-dashoffset 1.5s ease-out' }}
                                 />
                             </svg>
-                            <div className="pdp-ring-label">
-                                <span className="pdp-ring-val">{project.progress}%</span>
-                                <span className="pdp-ring-sub">Incubation</span>
+                            <div className="pd-ring-label">
+                                <span className="pd-ring-val">{project.progress}%</span>
+                                <span className="pd-ring-sub">Goal</span>
+                            </div>
+                        </div>
+                        <div className="pd-hero-vitals-divider"></div>
+                        <div className="pd-hero-vitals-metrics">
+                            <div className="pd-vitals-item">
+                                <span className="pd-vitals-label">Health</span>
+                                <span className="pd-vitals-val pd-text-green">{project.healthScore}%</span>
+                            </div>
+                            <div className="pd-vitals-item">
+                                <span className="pd-vitals-label">Risk</span>
+                                <span className={`pd-vitals-val pd-risk--${project.riskLevel.toLowerCase()}`}>{project.riskLevel}</span>
                             </div>
                         </div>
                     </div>
                 </div>
-                <div className="pdp-prog-bar">
-                    <div className="pdp-prog-fill" style={{ width: `${project.progress}%`, background: accent }}></div>
+
+                <div className="pd-hero-bottom-bar">
+                    <div className="pd-prog-bar">
+                        <div className="pd-prog-fill" style={{ width: `${project.progress}%`, background: accent }}></div>
+                    </div>
                 </div>
             </header>
 
-            {/* Tabs */}
-            <div className="pdp-tabs">
-                <div className="pdp-tabs-inner">
+            <div className="pd-tabs">
+                <div className="pd-tabs-inner">
                     {['Overview', 'Analytics', 'Team', 'Products'].map(tab => (
                         <button
                             key={tab}
-                            className={`pdp-tab ${activeTab === tab ? 'pdp-tab--active' : ''}`}
+                            className={`pd-tab ${activeTab === tab ? 'pd-tab--active' : ''}`}
                             onClick={() => setActiveTab(tab)}
-                            style={{ '--pdp-accent': accent }}
+                            style={{ '--pd-accent': accent }}
                         >
                             {tab}
                         </button>
@@ -282,25 +331,62 @@ export default function ProjectDetailPage() {
             </div>
 
             {/* Content */}
-            <main className="pdp-content" key={animKey}>
+            <main className="pd-content" key={animKey}>
                 {activeTab === 'Overview' && (
-                    <div className="pdp-kpi-grid">
-                        <KpiCard label="Total Learners" val={kpis.totalLearners.toLocaleString()} delay="0s" />
-                        <KpiCard label="Active Teams" val={kpis.totalTeams} delay="0.05s" />
-                        <KpiCard label="Total Mentors" val={kpis.totalMentors} delay="0.1s" />
-                        <KpiCard label="Total Applications" val={kpis.totalApplications.toLocaleString()} delay="0.15s" />
+                    <div className="pd-overview-layout">
+                        <div className="pd-kpi-column">
+                            <div className="pd-kpi-grid">
+                                <KpiCard label="Total Learners" val={kpis.totalLearners.toLocaleString()} delay="0s" />
+                                <KpiCard label="Active Teams" val={kpis.totalTeams} delay="0.05s" />
+                                <KpiCard label="Total Mentors" val={kpis.totalMentors} delay="0.1s" />
+                                <KpiCard label="Total Applications" val={kpis.totalApplications.toLocaleString()} delay="0.15s" />
+                                <KpiCard label="Active Cohorts" val={kpis.activeCohorts} delay="0.2s" />
+                                <KpiCard label="Seed Deployed" val={kpis.seedDeployed} delay="0.25s" />
+                                <KpiCard label="Stipends" val={kpis.stipendsDisbursed} delay="0.3s" />
+                                <KpiCard label="Placement Rate" val={kpis.placementRate} delay="0.35s" />
+                            </div>
+                        </div>
 
-                        <KpiCard label="Active Cohorts" val={kpis.activeCohorts} delay="0.2s" />
-                        <KpiCard label="Seed Deployed" val={kpis.seedDeployed} delay="0.25s" />
-                        <KpiCard label="Stipends" val={kpis.stipendsDisbursed} delay="0.3s" />
-                        <KpiCard label="Placement Rate" val={kpis.placementRate} delay="0.35s" />
+                        <div className="pd-timeline-column anim-fade-in delay-2">
+                            <div className="pd-timeline-card">
+                                <h3 className="pd-timeline-title">Recent Activity</h3>
+                                <div className="pd-timeline">
+                                    {project.recentActivities.map((act) => (
+                                        <div key={act.id} className="pd-timeline-item">
+                                            <div className={`pd-timeline-icon pd-icon--${act.type}`}></div>
+                                            <div className="pd-timeline-info">
+                                                <p className="pd-timeline-text">{act.text}</p>
+                                                <span className="pd-timeline-time">{act.time}</span>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                                <button className="pd-timeline-more">View All Activity →</button>
+                            </div>
+
+                            <div className="pd-resource-card anim-fade-in delay-3">
+                                <h3 className="pd-timeline-title">Organization</h3>
+                                <div className="pd-org-meta">
+                                    <div className="pd-org-stat">
+                                        <span className="pd-org-val">1:4</span>
+                                        <span className="pd-org-lbl">Mentor-Team Ratio</span>
+                                    </div>
+                                    <div className="pd-org-bar-wrap">
+                                        <div className="pd-org-bar">
+                                            <div className="pd-org-fill" style={{ width: '75%', background: accent }}></div>
+                                        </div>
+                                        <span className="pd-org-sub">Capacity utilized: 75%</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 )}
 
                 {activeTab === 'Analytics' && (
-                    <div className="pdp-charts">
-                        <div className="pdp-chart-card anim-slide-up delay-1">
-                            <h3 className="pdp-chart-title">Monthly Leads Pipeline</h3>
+                    <div className="pd-charts">
+                        <div className="pd-chart-card anim-slide-up delay-1">
+                            <h3 className="pd-chart-title">Monthly Leads Pipeline</h3>
                             <div style={{ width: '100%', height: 260 }}>
                                 <ResponsiveContainer>
                                     <AreaChart data={project.monthlyLeads} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
@@ -320,8 +406,8 @@ export default function ProjectDetailPage() {
                             </div>
                         </div>
 
-                        <div className="pdp-chart-card anim-slide-up delay-2">
-                            <h3 className="pdp-chart-title">Ecosystem Revenue (₹ Lakhs)</h3>
+                        <div className="pd-chart-card anim-slide-up delay-2">
+                            <h3 className="pd-chart-title">Ecosystem Revenue (₹ Lakhs)</h3>
                             <div style={{ width: '100%', height: 260 }}>
                                 <ResponsiveContainer>
                                     <BarChart data={project.revenueData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
@@ -338,15 +424,15 @@ export default function ProjectDetailPage() {
                 )}
 
                 {activeTab === 'Team' && (
-                    <div className="pdp-team">
+                    <div className="pd-team">
                         {project.team.map((member, i) => (
-                            <div key={member.name} className="pdp-team-card" style={{ animationDelay: `${i * 0.08}s` }}>
-                                <div className="pdp-team-avatar" style={{ background: 'var(--c-raised)', color: 'var(--c-text-2)' }}>
+                            <div key={member.name} className="pd-team-card" style={{ animationDelay: `${i * 0.08}s` }}>
+                                <div className="pd-team-avatar" style={{ background: 'var(--c-raised)', color: 'var(--c-text-2)' }}>
                                     {member.avatar}
                                 </div>
-                                <div className="pdp-team-info">
-                                    <div className="pdp-team-name">{member.name}</div>
-                                    <div className="pdp-team-role">{member.role}</div>
+                                <div className="pd-team-info">
+                                    <div className="pd-team-name">{member.name}</div>
+                                    <div className="pd-team-role">{member.role}</div>
                                 </div>
                             </div>
                         ))}
@@ -354,29 +440,29 @@ export default function ProjectDetailPage() {
                 )}
 
                 {activeTab === 'Products' && (
-                    <div className="pdp-products">
-                        <div className="pdp-products-hd anim-fade-in">
-                            <h3 className="pdp-products-title">Platform Features & Modules</h3>
+                    <div className="pd-products">
+                        <div className="pd-products-hd anim-fade-in">
+                            <h3 className="pd-products-title">Platform Features & Modules</h3>
                             <button className="btn btn-subtle">+ Add specific</button>
                         </div>
-                        <div className="pdp-product-list">
+                        <div className="pd-product-list">
                             {project.products.map((prod, i) => (
-                                <div key={prod} className="pdp-product-row" style={{ animationDelay: `${i * 0.08}s` }}>
-                                    <div className="pdp-product-icon" style={{ background: 'var(--c-accent-bg)', color: accent }}>
+                                <div key={prod} className="pd-product-row" style={{ animationDelay: `${i * 0.08}s` }}>
+                                    <div className="pd-product-icon" style={{ background: 'var(--c-accent-bg)', color: accent }}>
                                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="18" height="18">
                                             <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
                                             <polyline points="2 17 12 22 22 17"></polyline>
                                             <polyline points="2 12 12 17 22 12"></polyline>
                                         </svg>
                                     </div>
-                                    <div className="pdp-product-info">
-                                        <div className="pdp-product-name">{prod}</div>
-                                        <div className="pdp-product-proj">{project.name} • Active</div>
+                                    <div className="pd-product-info">
+                                        <div className="pd-product-name">{prod}</div>
+                                        <div className="pd-product-proj">{project.name} • Active</div>
                                     </div>
-                                    <button className="pdp-product-arrow">
+                                    <button className="pd-product-arrow">
                                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="18" height="18">
                                             <line x1="5" y1="12" x2="19" y2="12"></line>
-                                            <polyline points="12 5 19 12 12 19"></polyline>
+                                            <polyline points="12 5 19 12 19"></polyline>
                                         </svg>
                                     </button>
                                 </div>
@@ -386,9 +472,7 @@ export default function ProjectDetailPage() {
                 )}
             </main>
 
-            {isAddProductOpen && (
-                <AddProductModal onClose={() => setIsAddProductOpen(false)} defaultProject={project.name} />
-            )}
+            {/* Modal removed as per request */}
         </div>
     );
 }
@@ -396,9 +480,9 @@ export default function ProjectDetailPage() {
 // Sub-components
 function KpiCard({ label, val, delay }) {
     return (
-        <div className="pdp-kpi-card" style={{ animationDelay: delay }}>
-            <div className="pdp-kpi-val">{val}</div>
-            <div className="pdp-kpi-label">{label}</div>
+        <div className="pd-kpi-card" style={{ animationDelay: delay }}>
+            <div className="pd-kpi-val">{val}</div>
+            <div className="pd-kpi-label">{label}</div>
         </div>
     );
 }
@@ -406,9 +490,9 @@ function KpiCard({ label, val, delay }) {
 const CustomTooltip = ({ active, payload, label, unit, prefix = '' }) => {
     if (active && payload && payload.length) {
         return (
-            <div className="pdp-tooltip">
-                <p className="pdp-tooltip-label">{label}</p>
-                <p style={{ color: payload[0].stroke || payload[0].fill, fontFamily: 'var(--font-mono)', fontWeight: 600 }}>
+            <div className="pd-tooltip">
+                <p className="pd-tooltip-label">{label}</p>
+                <p className="pd-tooltip-val" style={{ color: payload[0].stroke || payload[0].fill }}>
                     {prefix}{payload[0].value}{unit}
                 </p>
             </div>

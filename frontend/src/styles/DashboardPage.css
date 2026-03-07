@@ -419,57 +419,63 @@
 
 .db-page-title {
     font-family: var(--font-display);
-    font-size: 2rem;
-    font-weight: 800;
+    font-size: 2.2rem;
+    font-weight: 900;
     color: var(--c-text);
-    margin-bottom: 24px;
-    letter-spacing: -0.02em;
+    margin-bottom: 28px;
+    letter-spacing: -0.03em;
+    background: linear-gradient(135deg, var(--c-text) 0%, #4A5568 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
 }
 
 .db-projects-bar {
     background: #FFFFFF;
     border: 1px solid var(--c-border);
-    border-radius: var(--r-lg);
-    padding: 20px 32px;
+    border-radius: 20px;
+    padding: 24px 32px;
     display: flex;
     align-items: center;
     justify-content: space-between;
     margin-bottom: 32px;
-    box-shadow: var(--shadow-md);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
 }
 
 .db-projects-bar h2 {
-    font-size: 1.2rem;
-    font-weight: 700;
+    font-size: 1.25rem;
+    font-weight: 800;
     color: var(--c-text);
+    margin: 0;
 }
 
 .db-add-btn {
     background: var(--c-accent);
     color: white;
     border: none;
-    padding: 12px 24px;
-    border-radius: var(--r-md);
-    font-size: 0.85rem;
-    font-weight: 700;
+    padding: 12px 28px;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    font-weight: 800;
     cursor: pointer;
     display: inline-flex;
     align-items: center;
-    gap: 8px;
-    transition: all 0.2s;
-    box-shadow: 0 4px 12px rgba(209, 73, 49, 0.25);
+    gap: 10px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 8px 16px rgba(209, 73, 49, 0.2);
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
 }
 
 .db-add-btn:hover {
     background: var(--c-accent-2);
-    transform: translateY(-1px);
-    box-shadow: 0 6px 20px rgba(209, 73, 49, 0.3);
+    transform: translateY(-2px);
+    box-shadow: 0 12px 24px rgba(209, 73, 49, 0.3);
 }
 
 .db-cards-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
-    gap: 24px;
+    grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+    gap: 32px;
 }
 
 @media (max-width: 1024px) {

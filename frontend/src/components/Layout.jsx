@@ -6,6 +6,7 @@ export default function Layout() {
     const navigate = useNavigate();
     const location = useLocation();
     const [isCollapsed, setIsCollapsed] = useState(true);
+    const [isHovered, setIsHovered] = useState(false);
 
     const getFormattedDate = () => {
         return new Date().toLocaleDateString('en-GB', {
@@ -50,9 +51,13 @@ export default function Layout() {
     ];
 
     return (
-        <div className={`db-layout ${isCollapsed ? 'collapsed' : ''} anim-fade-in`}>
+        <div className={`db-layout ${(isCollapsed && !isHovered) ? 'collapsed' : ''} anim-fade-in`}>
             {/* Sidebar */}
-            <aside className="db-sidebar">
+            <aside
+                className="db-sidebar"
+                onMouseEnter={() => setIsHovered(true)}
+                onMouseLeave={() => setIsHovered(false)}
+            >
                 <div className="db-sidebar-header">
                     <div className="db-sidebar-toggle" onClick={() => setIsCollapsed(!isCollapsed)}>
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -99,7 +104,10 @@ export default function Layout() {
                 </div>
 
                 <div className="db-sidebar-bottom">
-                    <div className="db-sidebar-link">
+                    <div
+                        className={`db-sidebar-link ${location.pathname === '/settings' ? 'active' : ''}`}
+                        onClick={() => navigate('/settings')}
+                    >
                         <span className="db-sidebar-icon-wrapper">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="db-sidebar-icon">
                                 <circle cx="12" cy="12" r="3"></circle>

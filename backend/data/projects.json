@@ -1,1 +1,11 @@
-[]
+[
+  {
+    "id": "default-sv",
+    "name": "StartupVarsity Default",
+    "mcpUrl": "https://www.startupvarsity.com",
+    "email": "admin@startupvarsity.com",
+    "password": "admin123",
+    "status": "Active",
+    "description": "Default project configured via .env"
+  }
+]
