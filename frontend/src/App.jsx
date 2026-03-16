@@ -5,6 +5,7 @@ import ProjectDetailPage from './pages/ProjectDetailPage';
 import SettingsPage from './pages/SettingsPage';
 import ChatBot from './components/ChatBot';
 import Layout from './components/Layout';
+import { UserProvider } from './context/UserContext';
 
 function AppRoutes() {
   return (
@@ -13,10 +14,11 @@ function AppRoutes() {
 
       {/* Routes that share the Dashboard Layout */}
       <Route element={<Layout />}>
-        <Route path="/dashboard" element={<DashboardPage />} />
+      <Route path="/dashboard" element={<DashboardPage />} />
         <Route path="/ai-assistant" element={<ChatBot />} />
         <Route path="/project/:id" element={<ProjectDetailPage />} />
         <Route path="/settings" element={<SettingsPage />} />
+        <Route path="/profile" element={<Navigate to="/settings" replace />} />
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
@@ -25,8 +27,10 @@ function AppRoutes() {
 
 export default function App() {
   return (
-    <BrowserRouter>
-      <AppRoutes />
-    </BrowserRouter>
+    <UserProvider>
+      <BrowserRouter>
+        <AppRoutes />
+      </BrowserRouter>
+    </UserProvider>
   );
 }

@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { createPortal } from 'react-dom';
+import { X, Check, Wand2 } from 'lucide-react';
 import '../styles/AddProductModal.css';
 
 const empty = { name: '', mcpUrl: '', status: 'Active', email: '', password: '', description: '' };
@@ -77,9 +78,7 @@ export default function AddProductModal({ onClose, onAddProject }) {
                         <h2 className="apm-title">Connect New Project</h2>
                     </div>
                     <button className="apm-close" onClick={onClose} aria-label="Close">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="16" height="16">
-                            <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
-                        </svg>
+                        <X size={16} />
                     </button>
                 </div>
 
@@ -90,9 +89,7 @@ export default function AddProductModal({ onClose, onAddProject }) {
                 {done ? (
                     <div className="apm-success anim-scale-in">
                         <div className="apm-success-icon">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="28" height="28">
-                                <polyline points="20 6 9 17 4 12" />
-                            </svg>
+                            <Check size={28} />
                         </div>
                         <h3 className="apm-success-title">Connection Successful</h3>
                         <p className="apm-success-desc">

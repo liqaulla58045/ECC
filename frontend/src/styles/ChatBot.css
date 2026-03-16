@@ -4,16 +4,17 @@
    ══════════════════════════════════════════════ */
 
 :root {
-    --cb-bg-gradient: radial-gradient(circle at center, rgba(81, 72, 204, 0.03) 0%, transparent 70%);
+    --cb-bg-gradient: radial-gradient(circle at center, rgba(217, 119, 6, 0.03) 0%, transparent 70%);
 }
 
 .cb-root {
     display: flex;
     flex-direction: column;
-    height: calc(100vh - 70px - 64px);
+    min-height: calc(100vh - 70px - 100px);
+    /* Slightly more space for better vertical fit */
+    /* Fill available space */
     width: 100%;
     position: relative;
-    overflow: hidden;
 }
 
 .cb-root--landing {
@@ -29,20 +30,42 @@
     display: flex;
     flex-direction: column;
     align-items: center;
+    justify-content: center;
+    /* Vertical centering */
+    flex: 1;
+    /* Take full height of parent */
     animation: fadeInUp 0.6s var(--ease-spring);
-    padding: 0 20px;
+    padding: 40px 20px;
 }
 
-.cb-landing-hero {
-    text-align: center;
-    margin-bottom: 32px;
+.cb-hero-icon-wrap {
+    width: 64px;
+    height: 64px;
+    border-radius: 18px;
+    background: var(--c-accent-bg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--c-accent);
+    margin: 0 auto 20px;
 }
 
-.cb-landing-emoji {
-    font-size: 3rem;
-    display: block;
-    margin-bottom: 16px;
-    animation: wave 2.5s infinite;
+.cb-hero-icon {
+    animation: simple-pulse 4s ease-in-out infinite;
+}
+
+@keyframes simple-pulse {
+
+    0%,
+    100% {
+        opacity: 0.8;
+        transform: scale(1);
+    }
+
+    50% {
+        opacity: 1;
+        transform: scale(1.05);
+    }
 }
 
 .cb-landing-title {
@@ -67,21 +90,28 @@
     flex-direction: column;
     gap: 16px;
     margin-bottom: 40px;
+    position: relative;
+    /* Anchor for notification */
+}
+
+.cb-landing-hero {
+    text-align: center;
+    margin-bottom: 40px;
 }
 
 .cb-landing-input-box {
     background: rgba(255, 255, 255, 0.8);
     backdrop-filter: blur(8px);
     border: 1px solid var(--c-border);
-    border-radius: 20px;
-    padding: 16px;
+    border-radius: 16px;
+    padding: 12px 14px 10px;
     box-shadow: 0 10px 40px rgba(0, 0, 0, 0.04);
     transition: all 0.3s;
 }
 
 .cb-landing-input-box:focus-within {
     border-color: var(--c-accent);
-    box-shadow: 0 15px 50px rgba(81, 72, 204, 0.08);
+    box-shadow: 0 15px 50px rgba(119, 131, 140, 0.1);
     transform: translateY(-2px);
     background: #fff;
 }
@@ -148,7 +178,7 @@
 
 .cb-landing-send--active {
     background: var(--c-accent);
-    box-shadow: 0 4px 12px rgba(81, 72, 204, 0.3);
+    box-shadow: 0 4px 12px rgba(119, 131, 140, 0.3);
 }
 
 .cb-landing-send--active:hover {
@@ -206,7 +236,8 @@
     color: var(--c-text-3);
     text-transform: uppercase;
     letter-spacing: 0.05em;
-    margin-bottom: 16px;
+    margin-top: 56px;
+    margin-bottom: 24px;
 }
 
 .cb-action-grid {
@@ -278,8 +309,8 @@
     gap: 8px;
 }
 
-.cb-bot-emoji {
-    font-size: 1.2rem;
+.cb-bot-icon {
+    color: var(--c-accent);
 }
 
 .cb-active-title {
@@ -290,13 +321,16 @@
 }
 
 .cb-header-btn {
-    padding: 6px 12px;
+    padding: 6px 14px;
     border-radius: 8px;
     border: 1px solid var(--c-border);
     background: #fff;
     font-size: 0.8rem;
     font-weight: 600;
     cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
     transition: all 0.2s;
 }
 
@@ -369,7 +403,7 @@
     padding: 12px 20px;
     border-radius: 20px;
     border-bottom-right-radius: 4px;
-    box-shadow: 0 4px 15px rgba(81, 72, 204, 0.15);
+    box-shadow: 0 4px 15px rgba(119, 131, 140, 0.15);
 }
 
 .cb-time {
@@ -382,31 +416,38 @@
 
 /* ─── ACTIVE FOOTER ─── */
 .cb-active-footer {
-    padding-top: 20px;
+    padding-top: 16px;
     background: var(--c-bg);
-    /* Match dash background */
     flex-shrink: 0;
 }
 
+/* Unified input card — wraps textarea + bottom toolbar */
 .cb-input-row {
     background: #fff;
     border: 1px solid var(--c-border);
-    border-radius: 16px;
-    padding: 8px 12px 8px 20px;
+    border-radius: 18px;
+    padding: 14px 14px 10px 18px;
     display: flex;
-    align-items: center;
-    gap: 12px;
+    flex-direction: column;
+    gap: 8px;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
     transition: all 0.2s;
 }
 
 .cb-input-row:focus-within {
     border-color: var(--c-accent);
-    box-shadow: 0 8px 30px rgba(81, 72, 204, 0.1);
+    box-shadow: 0 8px 30px rgba(119, 131, 140, 0.1);
+}
+
+/* Inner wrapper that holds textarea + bottom row */
+.cb-input-inner {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
 }
 
 .cb-input {
-    flex: 1;
+    width: 100%;
     border: none;
     background: transparent;
     font-size: 0.95rem;
@@ -414,12 +455,40 @@
     outline: none;
     resize: none;
     font-family: var(--font-body);
-    padding: 8px 0;
+    padding: 0;
+    line-height: 1.5;
+    min-height: 24px;
+}
+
+/* Bottom toolbar: icon buttons left, send button right */
+.cb-input-bottom-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 4px;
+}
+
+.cb-input-actions-left {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+/* Small icon-only variant for the inline toolbar */
+.cb-icon-btn--sm {
+    padding: 5px 6px;
+    border-radius: 8px;
+    color: var(--c-text-3);
+}
+
+.cb-icon-btn--sm:hover {
+    background: var(--c-accent-bg);
+    color: var(--c-accent);
 }
 
 .cb-send {
-    width: 36px;
-    height: 36px;
+    width: 32px;
+    height: 32px;
     border-radius: 10px;
     background: var(--c-border);
     border: none;
@@ -429,10 +498,17 @@
     justify-content: center;
     cursor: pointer;
     transition: all 0.2s;
+    flex-shrink: 0;
 }
 
 .cb-send--active {
     background: var(--c-accent);
+    box-shadow: 0 4px 12px rgba(119, 131, 140, 0.3);
+}
+
+.cb-send--active:hover {
+    transform: translateY(-1px);
+    background: var(--c-accent-2);
 }
 
 /* ─── TYPING ─── */
@@ -481,19 +557,74 @@
     }
 }
 
-@keyframes wave {
+/* ─── FEEDBACK & NOTIFICATIONS ─── */
+.cb-notif {
+    position: absolute;
+    top: -50px;
+    /* Move to top of input for visibility */
+    left: 50%;
+    transform: translateX(-50%);
+    background: #333;
+    color: #fff;
+    padding: 8px 20px;
+    border-radius: 12px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    white-space: nowrap;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+    z-index: 200;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
 
-    0%,
-    100% {
+.cb-icon-btn {
+    transition: all 0.2s var(--ease);
+}
+
+.cb-icon-btn:hover {
+    background: var(--c-accent-bg);
+    color: var(--c-accent);
+}
+
+.cb-icon-btn--active {
+    background: var(--c-accent-bg);
+    color: var(--c-accent);
+    border-color: var(--c-accent);
+}
+
+.cb-anim-fade-up {
+    animation: cbFadeUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes cbFadeUp {
+    from {
+        opacity: 0;
+        transform: translate(-50%, 10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translate(-50%, 0);
+    }
+}
+
+.cb-spin {
+    animation: spin 3s linear infinite;
+}
+
+@keyframes spin {
+    from {
         transform: rotate(0deg);
     }
 
-    25% {
-        transform: rotate(20deg);
+    to {
+        transform: rotate(360deg);
     }
+}
 
-    75% {
-        transform: rotate(-15deg);
+/* Removal of procedural AI animations */
+@keyframes wave {
+    0% {
+        transform: rotate(0);
     }
 }
 

@@ -1,7 +1,26 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-// import AddProductModal from '../components/AddProductModal';
+import {
+    ChevronLeft,
+    Share2,
+    Sliders,
+    Calendar,
+    ExternalLink,
+    Github,
+    Users,
+    Layers,
+    GraduationCap,
+    Target,
+    FileText,
+    TrendingUp,
+    ShieldCheck,
+    AlertCircle,
+    Activity,
+    Milestone,
+    UserPlus,
+    Presentation
+} from 'lucide-react';
 import '../styles/ProjectDetailPage.css';
 
 export default function ProjectDetailPage() {
@@ -216,9 +235,7 @@ export default function ProjectDetailPage() {
             {/* Sticky Nav */}
             <nav className="pdp-nav">
                 <button className="pdp-back" onClick={() => navigate('/dashboard')}>
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="16" height="16">
-                        <polyline points="15 18 9 12 15 6"></polyline>
-                    </svg>
+                    <ChevronLeft size={16} />
                     Back
                 </button>
                 <div className="pdp-nav-meta">
@@ -228,15 +245,10 @@ export default function ProjectDetailPage() {
                 </div>
                 <div className="pdp-nav-actions">
                     <button className="btn btn-subtle icon-btn" title="Share">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="16" height="16">
-                            <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8M16 6l-4-4-4 4M12 2v13" />
-                        </svg>
+                        <Share2 size={16} />
                     </button>
                     <button className="btn btn-subtle icon-btn" title="Settings">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="16" height="16">
-                            <circle cx="12" cy="12" r="3" />
-                            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" />
-                        </svg>
+                        <Sliders size={16} />
                     </button>
                 </div>
             </nav>
@@ -248,12 +260,7 @@ export default function ProjectDetailPage() {
                     <p className="pd-subtitle anim-slide-up delay-2">{project.description}</p>
                     <div className="pd-hero-meta anim-slide-up delay-3">
                         <div className="pd-hero-dates">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="18" height="18">
-                                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-                                <line x1="16" y1="2" x2="16" y2="6"></line>
-                                <line x1="8" y1="2" x2="8" y2="6"></line>
-                                <line x1="3" y1="10" x2="21" y2="10"></line>
-                            </svg>
+                            <Calendar size={18} />
                             {project.startDate} &mdash; {project.endDate}
                         </div>
                         <div className="pd-hero-actions-row">
@@ -263,45 +270,43 @@ export default function ProjectDetailPage() {
                                 rel="noopener noreferrer"
                                 className="btn btn-solid pd-live-btn"
                             >
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="18" height="18" style={{ marginRight: '8px' }}>
-                                    <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
-                                    <polyline points="15 3 21 3 21 9"></polyline>
-                                    <line x1="10" y1="14" x2="21" y2="3"></line>
-                                </svg>
+                                <ExternalLink size={18} style={{ marginRight: '8px' }} />
                                 Live Demo
                             </a>
-                            <button className="btn btn-subtle">View Repository</button>
+                            <button className="btn btn-subtle">
+                                <Github size={18} style={{ marginRight: '8px' }} />
+                                Repository
+                            </button>
                         </div>
                     </div>
                 </div>
 
-                <div className="pd-hero-visuals anim-slide-up delay-3">
+                <div className="pd-hero-visuals anim-slide-up delay-4">
                     <div className="pd-hero-vitals-card">
-                        <div className="pd-ring-wrap">
-                            <svg className="pd-ring-svg" viewBox="0 0 100 100" style={{ transform: 'rotate(-90deg)', width: '100%', height: '100%' }}>
-                                <circle cx="50" cy="50" r="44" fill="none" stroke="var(--c-raised)" strokeWidth="6" />
-                                <circle
-                                    cx="50" cy="50" r="44" fill="none"
-                                    stroke={accent} strokeWidth="6"
-                                    strokeLinecap="round"
-                                    strokeDasharray="276.46"
-                                    strokeDashoffset={276.46 - (276.46 * project.progress) / 100}
-                                    style={{ transition: 'stroke-dashoffset 1.5s ease-out' }}
-                                />
-                            </svg>
-                            <div className="pd-ring-label">
-                                <span className="pd-ring-val">{project.progress}%</span>
-                                <span className="pd-ring-sub">Goal</span>
+                        <div className="pd-vitals-header">
+                            <Target size={20} className="pd-icon-accent" />
+                            <span className="pd-vitals-title">Project Goal</span>
+                        </div>
+                        <div className="pd-prog-display">
+                            <span className="pd-prog-val">{project.progress}%</span>
+                            <div className="pd-prog-ring-mini">
+                                <div className="pd-prog-fill-mini" style={{ width: `${project.progress}%` }}></div>
                             </div>
                         </div>
                         <div className="pd-hero-vitals-divider"></div>
                         <div className="pd-hero-vitals-metrics">
                             <div className="pd-vitals-item">
-                                <span className="pd-vitals-label">Health</span>
+                                <div className="pd-vitals-icon-label">
+                                    <Activity size={12} />
+                                    <span>Health</span>
+                                </div>
                                 <span className="pd-vitals-val pd-text-green">{project.healthScore}%</span>
                             </div>
                             <div className="pd-vitals-item">
-                                <span className="pd-vitals-label">Risk</span>
+                                <div className="pd-vitals-icon-label">
+                                    <AlertCircle size={12} />
+                                    <span>Risk</span>
+                                </div>
                                 <span className={`pd-vitals-val pd-risk--${project.riskLevel.toLowerCase()}`}>{project.riskLevel}</span>
                             </div>
                         </div>
@@ -353,7 +358,11 @@ export default function ProjectDetailPage() {
                                 <div className="pd-timeline">
                                     {project.recentActivities.map((act) => (
                                         <div key={act.id} className="pd-timeline-item">
-                                            <div className={`pd-timeline-icon pd-icon--${act.type}`}></div>
+                                            <div className={`pd-timeline-icon-wrap pd-icon--${act.type}`}>
+                                                {act.type === 'milestone' && <Milestone size={14} />}
+                                                {act.type === 'team' && <Users size={14} />}
+                                                {act.type === 'mentor' && <UserPlus size={14} />}
+                                            </div>
                                             <div className="pd-timeline-info">
                                                 <p className="pd-timeline-text">{act.text}</p>
                                                 <span className="pd-timeline-time">{act.time}</span>
@@ -449,21 +458,14 @@ export default function ProjectDetailPage() {
                             {project.products.map((prod, i) => (
                                 <div key={prod} className="pd-product-row" style={{ animationDelay: `${i * 0.08}s` }}>
                                     <div className="pd-product-icon" style={{ background: 'var(--c-accent-bg)', color: accent }}>
-                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="18" height="18">
-                                            <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
-                                            <polyline points="2 17 12 22 22 17"></polyline>
-                                            <polyline points="2 12 12 17 22 12"></polyline>
-                                        </svg>
+                                        <Layers size={18} />
                                     </div>
                                     <div className="pd-product-info">
                                         <div className="pd-product-name">{prod}</div>
                                         <div className="pd-product-proj">{project.name} • Active</div>
                                     </div>
                                     <button className="pd-product-arrow">
-                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="18" height="18">
-                                            <line x1="5" y1="12" x2="19" y2="12"></line>
-                                            <polyline points="12 5 19 12 19"></polyline>
-                                        </svg>
+                                        <ChevronLeft size={18} style={{ transform: 'rotate(180deg)' }} />
                                     </button>
                                 </div>
                             ))}

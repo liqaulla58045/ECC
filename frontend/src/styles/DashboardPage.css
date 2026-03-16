@@ -90,7 +90,7 @@
 .db-sidebar-profile {
     display: flex;
     align-items: center;
-    padding: 12px;
+    padding: 10px 12px;
     gap: 12px;
     margin: 8px 12px;
     border-radius: var(--r-md);
@@ -99,26 +99,97 @@
     transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.db-layout.collapsed .db-sidebar-profile {
-    padding: 12px 0;
-    margin: 8px 0;
-    justify-content: center;
-    background: transparent;
-    border-color: transparent;
-    width: 100%;
+.db-sidebar-profile:hover {
+    border-color: var(--c-accent);
+    background: var(--c-accent-bg);
 }
 
-.db-sidebar-avatar {
-    width: 38px;
-    height: 38px;
-    border-radius: 10px;
-    background: #FFFFFF;
-    border: 1px solid var(--c-border);
+/* ─── UNIFIED SIDEBAR TILE SYSTEM (Collapsed) ─── */
+.db-layout.collapsed .db-sidebar-profile,
+.db-layout.collapsed .db-sidebar-link {
+    width: 44px;
+    height: 44px;
+    margin: 8px auto;
+    padding: 0;
     display: flex;
     align-items: center;
     justify-content: center;
-    overflow: hidden;
-    flex-shrink: 0;
+    border-radius: 12px;
+    background: transparent; /* Default for links */
+    border: none;
+    cursor: pointer;
+    position: relative;
+    transition: all 0.2s ease;
+    color: var(--c-text-2);
+    gap: 0 !important;
+}
+
+/* Profile: Permanent Grey Box */
+.db-layout.collapsed .db-sidebar-profile {
+    background: var(--c-raised);
+    margin-top: 24px;
+    margin-bottom: 24px;
+}
+
+/* Active State: Slate Grey (Accent) */
+.db-layout.collapsed .db-sidebar-link.active,
+.db-layout.collapsed .db-sidebar-profile.active {
+    background: var(--c-accent);
+    color: #FFFFFF;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+
+/* Hover State */
+.db-layout.collapsed .db-sidebar-link:hover:not(.active),
+.db-layout.collapsed .db-sidebar-profile:hover:not(.active) {
+    background: var(--c-overlay);
+    color: var(--c-text);
+}
+
+/* Profile Initials: Constant Style */
+.db-layout.collapsed .db-sidebar-avatar {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.db-avatar-initials {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: inherit;
+    font-weight: 800;
+}
+
+.db-layout.collapsed .db-avatar-initials {
+    color: var(--c-text-2);
+    font-size: 0.8rem;
+}
+
+/* If profile is always grey, initials stay dark unless active */
+.db-layout.collapsed .db-sidebar-profile.active .db-avatar-initials {
+    color: #FFFFFF;
+}
+
+/* Force icons to inherit color and stay centered */
+.db-layout.collapsed .db-sidebar-link .db-sidebar-icon {
+    margin: 0;
+    transform: none !important;
+    display: block;
+}
+
+.db-layout.collapsed .db-sidebar-link.active .db-sidebar-icon {
+    color: #FFFFFF;
+}
+
+.db-sidebar-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
 }
 
 .db-sidebar-meta {
@@ -180,14 +251,7 @@
     white-space: nowrap;
 }
 
-.db-layout.collapsed .db-sidebar-link {
-    justify-content: center;
-    padding: 12px 0;
-    gap: 0;
-    margin: 0 10px;
-    border-radius: 12px;
-}
-
+/* Removed individual link overrides to rely on unified rules above */
 .db-sidebar-icon-wrapper {
     width: 24px;
     height: 24px;
@@ -213,10 +277,14 @@
     transform: translateX(2px);
 }
 
+.db-layout.collapsed .db-sidebar-link:hover .db-sidebar-icon {
+    transform: none;
+}
+
 .db-sidebar-link.active {
     color: #FFFFFF;
     background: var(--c-accent);
-    box-shadow: 0 4px 12px rgba(209, 73, 49, 0.2);
+    box-shadow: 0 4px 12px var(--shadow-accent, rgba(0, 0, 0, 0.1));
 }
 
 .db-sidebar-link.active .db-sidebar-icon {
@@ -271,18 +339,17 @@
 .db-layout.collapsed .db-sidebar-brand-group,
 .db-layout.collapsed .db-sidebar-meta,
 .db-layout.collapsed .db-nav-label {
-    opacity: 0;
-    pointer-events: none;
-    transform: translateX(-15px);
-    width: 0;
-    margin: 0;
-    overflow: hidden;
+    display: none; /* Completely remove from layout to ensure perfect centering */
 }
 
 /* Nav Bottom */
 .db-sidebar-bottom {
     padding: 12px;
     border-top: 1px solid var(--c-border);
+}
+
+.db-layout.collapsed .db-sidebar-bottom {
+    padding: 12px 0; /* Align settings icon by removing lateral padding */
 }
 
 /* ─── MAIN AREA ─── */
@@ -426,6 +493,7 @@
     letter-spacing: -0.03em;
     background: linear-gradient(135deg, var(--c-text) 0%, #4A5568 100%);
     -webkit-background-clip: text;
+    background-clip: text;
     -webkit-text-fill-color: transparent;
 }
 
@@ -461,7 +529,7 @@
     align-items: center;
     gap: 10px;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    box-shadow: 0 8px 16px rgba(209, 73, 49, 0.2);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
     text-transform: uppercase;
     letter-spacing: 0.02em;
 }
@@ -469,7 +537,7 @@
 .db-add-btn:hover {
     background: var(--c-accent-2);
     transform: translateY(-2px);
-    box-shadow: 0 12px 24px rgba(209, 73, 49, 0.3);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
 }
 
 .db-cards-grid {
