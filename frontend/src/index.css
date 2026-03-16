@@ -20,11 +20,12 @@
   --c-text-2: #555555;
   --c-text-3: #999999;
 
-  /* Accent — Blossom Orange */
-  --c-accent: #D14931;
-  --c-accent-2: #E85A42;
-  --c-accent-bg: rgba(209, 73, 49, 0.05);
-  --c-accent-bd: rgba(209, 73, 49, 0.15);
+  /* Accent — Golden Amber */
+  --c-accent: #77838c;
+  --c-accent-2: #8f9ba6;
+  /* Lighter Slate */
+  --c-accent-bg: rgba(119, 131, 140, 0.05);
+  --c-accent-bd: rgba(119, 131, 140, 0.15);
 
   /* Semantic - Blossom Palette */
   --c-green: #2B8A3E;
@@ -137,13 +138,13 @@ select {
 .btn-solid {
   background: var(--c-accent);
   color: #fff;
-  box-shadow: 0 2px 8px rgba(79, 70, 229, 0.22);
+  box-shadow: 0 4px 12px rgba(119, 131, 140, 0.15);
 }
 
 .btn-solid:hover {
   background: var(--c-accent-2);
   transform: translateY(-1px);
-  box-shadow: 0 6px 20px rgba(79, 70, 229, 0.28);
+  box-shadow: 0 8px 25px rgba(119, 131, 140, 0.2);
 }
 
 .btn-solid:active {

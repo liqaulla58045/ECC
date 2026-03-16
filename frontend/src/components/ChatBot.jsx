@@ -1,12 +1,29 @@
 import { useState, useRef, useEffect } from 'react';
-import { projects, chairman } from '../data/mockData';
+import {
+    MessageSquare,
+    Zap,
+    BarChart2,
+    TrendingUp,
+    Users as UsersIcon,
+    DollarSign,
+    Target,
+    FileText,
+    History,
+    Globe,
+    Paperclip,
+    ArrowUp,
+    RefreshCcw,
+    Layout
+} from 'lucide-react';
+import { projects } from '../data/mockData';
+import { useUser } from '../context/UserContext';
 import '../styles/ChatBot.css';
 
 const INITIAL_MESSAGES = [
     {
         id: 1,
         role: 'bot',
-        text: "Good day. I'm your ECC Assistant — connected to Claude. How can I help you with the enterprise portfolio today?",
+        text: "AI Assistant initialized. How can I assist you with your enterprise portfolio today?",
         time: now(),
     },
 ];
@@ -15,22 +32,10 @@ function now() {
     return new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true });
 }
 
-// Format the mock data into a string context for Claude
-const SV_CONTEXT = `
-You are the "ECC Assistant" - an AI dashboard assistant for the Chairman of the Enterprise Command Center (${chairman.name}).
-You have access to the following live platform data:
-${JSON.stringify(projects, null, 2)}
-
-Instructions:
-1. Answer the Chairman's questions accurately based ONLY on the data above.
-2. Keep your answers concise, professional, and slightly formal yet helpful.
-3. Use markdown bolding (e.g. **text**) for key metrics, numbers, or names to make them stand out.
-4. If asked something unrelated to the data, politely steer them back to portfolio metrics.
-5. Limit your responses to 2-3 short paragraphs at most.
-`;
+// Logic moved into component to stay synced with UserContext
 
 // Call Claude API via Vite Proxy
-async function askClaude(messageHistory, userText) {
+async function askClaude(messageHistory, userText, systemContext) {
     const apiKey = import.meta.env.VITE_CLAUDE_API;
 
     // Fallback if no API key is provided
@@ -61,7 +66,7 @@ async function askClaude(messageHistory, userText) {
             body: JSON.stringify({
                 model: 'claude-3-5-sonnet-20240620',
                 max_tokens: 400,
-                system: SV_CONTEXT,
+                system: systemContext,
                 messages: messages
             })
         });
@@ -102,12 +107,24 @@ function BotMessage({ text }) {
 }
 
 export default function ChatBot() {
+    const { user } = useUser();
     const [messages, setMessages] = useState([]); // Start empty for Blossom style
     const [input, setInput] = useState('');
     const [typing, setTyping] = useState(false);
-    const [isNewChat, setIsNewChat] = useState(true); // Track if we are in "Landing" state
+    const [isNewChat, setIsNewChat] = useState(true);
+    const [scope, setScope] = useState('portfolio'); // 'portfolio' or 'global'
+    const [notif, setNotif] = useState(null);
     const bottomRef = useRef(null);
     const inputRef = useRef(null);
+    const fileRef = useRef(null);
+
+    // Auto-clear notification
+    useEffect(() => {
+        if (notif) {
+            const t = setTimeout(() => setNotif(null), 3000);
+            return () => clearTimeout(t);
+        }
+    }, [notif]);
 
     useEffect(() => {
         bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -125,8 +142,15 @@ export default function ChatBot() {
         setInput('');
         setTyping(true);
 
+        // Create dynamic context with current user info
+        const systemContext = `
+You are the "AI Assistant" - an executive dashboard assistant for the Chairman of the Enterprise Command Center (${user.name}).
+You have access to the following live platform data:
+${JSON.stringify(projects, null, 2)}
+`;
+
         // Fetch response from Claude
-        const replyText = await askClaude(messages, text);
+        const replyText = await askClaude(messages, text, systemContext);
 
         setMessages(prev => [...prev, { id: Date.now() + 1, role: 'bot', text: replyText, time: now() }]);
         setTyping(false);
@@ -136,31 +160,39 @@ export default function ChatBot() {
         if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); }
     };
 
+    const handleAttach = () => fileRef.current?.click();
+    const handleHistory = () => setNotif("Contextual history analysis coming in next update.");
+    const handleGlobal = () => {
+        const newScope = scope === 'portfolio' ? 'global' : 'portfolio';
+        setScope(newScope);
+        setNotif(`Scope switched to: ${newScope.toUpperCase()}`);
+    };
+
     const CHIPS = [
-        { label: 'Metrics', icon: '📊' },
-        { label: 'Leads', icon: '📈' },
-        { label: 'Teams', icon: '👥' },
-        { label: 'Revenue', icon: '💰' },
-        { label: 'Forecast', icon: '🎯' }
+        { label: 'Metrics', icon: <BarChart2 size={14} /> },
+        { label: 'Trends', icon: <TrendingUp size={14} /> },
+        { label: 'Teams', icon: <UsersIcon size={14} /> },
+        { label: 'Revenue', icon: <DollarSign size={14} /> },
+        { label: 'Forecast', icon: <Target size={14} /> }
     ];
 
     const QUICK_ACTIONS = [
         {
-            title: 'Summarize Portfolio',
-            desc: 'High-level overview of all running projects',
-            icon: '📋',
+            title: 'Portfolio Summary',
+            desc: 'Consolidated overview of all active initiatives',
+            icon: <FileText size={18} />,
             query: 'Give me a summary of the entire enterprise portfolio.'
         },
         {
-            title: 'Analyze StartupVarsity',
-            desc: 'Deep dive into learner and lead trends',
-            icon: '🏫',
+            title: 'Platform Analysis',
+            desc: 'Strategic review of learner and engagement stats',
+            icon: <Layout size={18} />,
             query: 'Analyze the status and lead trends for StartupVarsity.'
         },
         {
-            title: 'Revenue Forecast',
-            desc: 'Predictions based on current quarterly data',
-            icon: '🚀',
+            title: 'Strategic Forecast',
+            desc: 'Quantitative predictions for the upcoming quarter',
+            icon: <TrendingUp size={18} />,
             query: 'What is the projected revenue for the next quarter?'
         }
     ];
@@ -171,37 +203,62 @@ export default function ChatBot() {
             {isNewChat ? (
                 <div className="cb-landing">
                     <div className="cb-landing-hero">
-                        <span className="cb-landing-emoji">👋</span>
-                        <h1 className="cb-landing-title">Welcome, Chairman</h1>
-                        <p className="cb-landing-subtitle">I'm here to help you plan, organize, and reflect on your portfolio.</p>
+                        <div className="cb-hero-icon-wrap">
+                            <MessageSquare size={32} className="cb-hero-icon" />
+                        </div>
+                        <h1 className="cb-landing-title">AI Assistant</h1>
+                        <p className="cb-landing-subtitle">Generate strategic insights, track portfolio health, and organize upcoming initiatives.</p>
                     </div>
 
                     <div className="cb-landing-input-wrap">
                         <div className="cb-landing-input-box">
                             <textarea
                                 className="cb-landing-input"
-                                placeholder="What would you like to plan or organize today?"
+                                placeholder="Query the portfolio or request a strategic update..."
                                 value={input}
                                 onChange={e => setInput(e.target.value)}
                                 onKeyDown={handleKey}
-                                rows={2}
+                                rows={1}
                             />
                             <div className="cb-landing-input-actions">
                                 <div className="cb-landing-input-left">
-                                    <button className="cb-icon-btn"><span className="icon-history" /> History</button>
-                                    <button className="cb-icon-btn"><span className="icon-global" /> Global</button>
-                                    <button className="cb-icon-btn"><span className="icon-attach" /> Attach</button>
+                                    <button className="cb-icon-btn" onClick={handleHistory} title="History">
+                                        <History size={14} /> History
+                                    </button>
+                                    <button
+                                        className={`cb-icon-btn ${scope === 'global' ? 'cb-icon-btn--active' : ''}`}
+                                        onClick={handleGlobal}
+                                        title="Switch Scope"
+                                    >
+                                        <Globe size={14} /> Global
+                                    </button>
+                                    <button className="cb-icon-btn" onClick={handleAttach} title="Attach">
+                                        <Paperclip size={14} /> Attach
+                                    </button>
                                 </div>
                                 <button
                                     className={`cb-landing-send ${input.trim() ? 'cb-landing-send--active' : ''}`}
                                     onClick={() => send()}
                                 >
-                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" width="18" height="18">
-                                        <path d="M7 11l5-5 5 5M12 6v12" />
-                                    </svg>
+                                    <ArrowUp size={18} />
                                 </button>
                             </div>
                         </div>
+
+                        {/* Hidden File Input */}
+                        <input
+                            type="file"
+                            ref={fileRef}
+                            style={{ display: 'none' }}
+                            onChange={(e) => setNotif(`Attached: ${e.target.files[0]?.name}`)}
+                        />
+
+                        {/* Notification Toast */}
+                        {notif && (
+                            <div className="cb-notif cb-anim-fade-up">
+                                {notif}
+                            </div>
+                        )}
 
                         <div className="cb-category-chips">
                             {CHIPS.map(c => (
@@ -215,8 +272,8 @@ export default function ChatBot() {
 
                     <div className="cb-quick-actions">
                         <div className="cb-section-header">
-                            <span className="cb-section-icon">⚡</span>
-                            Quick Action
+                            <Zap size={14} className="cb-section-icon" />
+                            STRATEGIC ACTIONS
                         </div>
                         <div className="cb-action-grid">
                             {QUICK_ACTIONS.map(action => (
@@ -236,11 +293,14 @@ export default function ChatBot() {
                     {/* Header for Active Chat */}
                     <div className="cb-active-header">
                         <div className="cb-active-title-wrap">
-                            <span className="cb-bot-emoji">🤖</span>
+                            <MessageSquare size={16} className="cb-bot-icon" />
                             <p className="cb-active-title">AI Assistant</p>
                         </div>
                         <div className="cb-active-header-actions">
-                            <button className="cb-header-btn" onClick={() => setIsNewChat(true)}>New Chat</button>
+                            <button className="cb-header-btn" onClick={() => setIsNewChat(true)}>
+                                <RefreshCcw size={12} />
+                                New Insight
+                            </button>
                         </div>
                     </div>
 
@@ -255,10 +315,7 @@ export default function ChatBot() {
                             <div key={msg.id} className={`cb-msg cb-msg--${msg.role}`}>
                                 {msg.role === 'bot' && (
                                     <div className="cb-bot-avatar">
-                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" width="14" height="14">
-                                            <circle cx="12" cy="8" r="4" />
-                                            <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" />
-                                        </svg>
+                                        <Target size={14} />
                                     </div>
                                 )}
                                 <div className="cb-bubble-wrap">
@@ -273,10 +330,7 @@ export default function ChatBot() {
                         {typing && (
                             <div className="cb-msg cb-msg--bot">
                                 <div className="cb-bot-avatar">
-                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" width="14" height="14">
-                                        <circle cx="12" cy="8" r="4" />
-                                        <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" />
-                                    </svg>
+                                    <RefreshCcw size={14} className="cb-spin" />
                                 </div>
                                 <div className="cb-typing">
                                     <span /><span /><span />
@@ -289,25 +343,49 @@ export default function ChatBot() {
                     {/* Footer Input for Active Chat */}
                     <div className="cb-active-footer">
                         <div className="cb-input-row">
-                            <textarea
-                                ref={inputRef}
-                                className="cb-input"
-                                placeholder="Message Assistant..."
-                                value={input}
-                                onChange={e => setInput(e.target.value)}
-                                onKeyDown={handleKey}
-                                rows={1}
-                            />
-                            <button
-                                className={`cb-send ${input.trim() ? 'cb-send--active' : ''}`}
-                                onClick={() => send()}
-                            >
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" width="18" height="18">
-                                    <path d="M7 11l5-5 5 5M12 6v12" />
-                                </svg>
-                            </button>
+                            <div className="cb-input-inner">
+                                <textarea
+                                    ref={inputRef}
+                                    className="cb-input"
+                                    placeholder="Ask about platform metrics..."
+                                    value={input}
+                                    onChange={e => setInput(e.target.value)}
+                                    onKeyDown={handleKey}
+                                    rows={1}
+                                />
+                                <div className="cb-input-bottom-row">
+                                    <div className="cb-input-actions-left">
+                                        <button className="cb-icon-btn cb-icon-btn--sm" onClick={handleHistory} title="History">
+                                            <History size={14} />
+                                        </button>
+                                        <button
+                                            className={`cb-icon-btn cb-icon-btn--sm ${scope === 'global' ? 'cb-icon-btn--active' : ''}`}
+                                            onClick={handleGlobal}
+                                            title="Switch Scope"
+                                        >
+                                            <Globe size={14} />
+                                        </button>
+                                        <button className="cb-icon-btn cb-icon-btn--sm" onClick={handleAttach} title="Attach">
+                                            <Paperclip size={14} />
+                                        </button>
+                                    </div>
+                                    <button
+                                        className={`cb-send ${input.trim() ? 'cb-send--active' : ''}`}
+                                        onClick={() => send()}
+                                    >
+                                        <ArrowUp size={18} />
+                                    </button>
+                                </div>
+                            </div>
                         </div>
                     </div>
+
+                    {/* Notification Toast */}
+                    {notif && (
+                        <div className="cb-notif cb-anim-fade-up">
+                            {notif}
+                        </div>
+                    )}
                 </>
             )}
         </div>

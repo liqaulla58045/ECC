@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Plus, ShieldAlert } from 'lucide-react';
 import { chairman } from '../data/mockData';
 import ProjectCard from '../components/ProjectCard';
 import AddProductModal from '../components/AddProductModal';
@@ -105,10 +106,7 @@ export default function DashboardPage() {
             <div className="db-projects-bar">
                 <h2>Running Projects ({filteredProjects.length} Active)</h2>
                 <button className="db-add-btn" onClick={() => setIsAddProductOpen(true)}>
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" width="16" height="16">
-                        <line x1="12" y1="5" x2="12" y2="19"></line>
-                        <line x1="5" y1="12" x2="19" y2="12"></line>
-                    </svg>
+                    <Plus size={16} strokeWidth={2.5} />
                     ADD PRODUCT
                 </button>
             </div>
@@ -120,10 +118,7 @@ export default function DashboardPage() {
                     </div>
                 ) : error === '401_UNAUTHORIZED' ? (
                     <div className="db-empty" style={{ flexDirection: 'column', gap: '1rem', maxWidth: '500px', margin: '0 auto' }}>
-                        <svg viewBox="0 0 24 24" fill="none" stroke="var(--c-accent)" strokeWidth="2" width="48" height="48">
-                            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
-                            <path d="M7 11V7a5 5 0 0110 0v4"></path>
-                        </svg>
+                        <ShieldAlert size={48} color="var(--c-accent)" />
                         <h3 style={{ margin: 0, color: 'var(--c-text-1)' }}>Backend Setup Required</h3>
                         <p style={{ margin: 0, color: 'var(--c-text-2)' }}>To view your live connected project data, please add your login credentials to the <code>.env</code> file. (This is NOT a login screen):</p>
                         <pre style={{ background: '#FFFFFF', padding: '1rem', borderRadius: '8px', textAlign: 'left', border: '1px solid #E2E8F0', width: '100%', fontSize: '0.9rem', color: '#1A202C' }}>
