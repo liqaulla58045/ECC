@@ -378,6 +378,7 @@
 .db-topbar {
     height: 70px;
     background: rgba(248, 248, 248, 0.8);
+    -webkit-backdrop-filter: blur(12px);
     backdrop-filter: blur(12px);
     display: flex;
     align-items: center;

@@ -2,6 +2,7 @@ import { Router, Response } from 'express';
 import { db } from '../db/index.js';
 import { authenticate, requireRole } from '../middleware/auth.js';
 import { AuthRequest } from '../types/index.js';
+import { registerProjectWithMcp, fetchMcpStats } from '../services/mcpConnector.js';
 
 const router = Router();
 router.use(authenticate);
@@ -124,6 +125,63 @@ router.post('/:id/snapshots', requireRole('chairman', 'admin'), async (req: Auth
          stipendsDisbursedLakhs ?? 0, placementRate ?? null, completionRate ?? null]
     );
     res.status(201).json(rows[0]);
+});
+
+// POST /api/projects/:id/sync — register with MCP server and pull live stats
+router.post('/:id/sync', requireRole('chairman', 'admin'), async (req: AuthRequest, res: Response): Promise<void> => {
+    const { email, password } = req.body;
+    const projectId = req.params.id;
+
+    const { rows } = await db.query(
+        'SELECT id, name, mcp_url, email FROM projects WHERE id = $1',
+        [projectId]
+    );
+    if (!rows[0]) { res.status(404).json({ error: 'Project not found.' }); return; }
+
+    const project = rows[0];
+    const mcpUrl = project.mcp_url;
+    const loginEmail = email || project.email;
+
+    if (!mcpUrl || !loginEmail || !password) {
+        res.status(400).json({ error: 'mcp_url, email, and password are required to sync.' });
+        return;
+    }
+
+    try {
+        // 1. Register project with MCP — triggers Playwright login
+        await registerProjectWithMcp(projectId, mcpUrl, loginEmail, password, project.name);
+
+        // 2. Fetch live stats from platform via MCP proxy
+        const raw = await fetchMcpStats(projectId);
+        const s = raw as any;
+
+        // 3. Save metrics snapshot
+        const snap = await db.query(
+            `INSERT INTO metrics_snapshots
+                (project_id, total_users, total_learners, total_teams, total_mentors,
+                 total_applications, active_cohorts, seed_deployed_lakhs, stipends_disbursed_lakhs)
+             VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9)
+             RETURNING *`,
+            [
+                projectId,
+                s.totalUsers         ?? s.total_users         ?? 0,
+                s.totalLearners      ?? s.total_learners      ?? 0,
+                s.totalTeams         ?? s.total_teams         ?? 0,
+                s.totalMentors       ?? s.total_mentors       ?? 0,
+                s.totalApplications  ?? s.total_applications  ?? 0,
+                s.activeCohorts      ?? s.active_cohorts      ?? 0,
+                s.seedDeployedLakhs  ?? s.seed_deployed_lakhs  ?? 0,
+                s.stipendsDisbursedLakhs ?? s.stipends_disbursed_lakhs ?? 0,
+            ]
+        );
+
+        // 4. Mark project as Active
+        await db.query(`UPDATE projects SET status = 'Active', updated_at = NOW() WHERE id = $1`, [projectId]);
+
+        res.json({ success: true, snapshot: snap.rows[0] });
+    } catch (err: any) {
+        res.status(500).json({ error: err.message || 'Sync failed' });
+    }
 });
 
 export default router;

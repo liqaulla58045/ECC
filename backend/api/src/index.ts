@@ -13,6 +13,7 @@ import applicationsRouter  from './routes/applications.js';
 import notificationsRouter from './routes/notifications.js';
 import analyticsRouter     from './routes/analytics.js';
 import miscRouter          from './routes/misc.js';
+import aiRouter            from './routes/ai.js';
 
 config();
 
@@ -49,6 +50,7 @@ app.use('/api/applications',  applicationsRouter);
 app.use('/api/notifications', notificationsRouter);
 app.use('/api/analytics',     analyticsRouter);
 app.use('/api',               miscRouter);   // problem-statements, job-postings, assessments, chatbot-enquiries
+app.use('/',                  aiRouter);     // /claude, /openai
 
 // ─── 404 ───────────────────────────────────────
 app.use((_req, res) => {

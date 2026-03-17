@@ -26,6 +26,8 @@ export default function ProjectDetailPage() {
     const [notifications, setNotifications] = useState([]);
     const [monthlyMetrics, setMonthlyMetrics] = useState([]);
     const [products, setProducts] = useState([]);
+    const [syncing, setSyncing] = useState(false);
+    const [syncMsg, setSyncMsg] = useState('');
 
     useEffect(() => {
         async function fetchAll() {
@@ -60,6 +62,27 @@ export default function ProjectDetailPage() {
     }, [id]);
 
     useEffect(() => { setAnimKey(k => k + 1); }, [activeTab]);
+
+    const handleSync = async () => {
+        const password = prompt(`Enter admin password for ${project?.name || 'this project'} to sync live data:`);
+        if (!password) return;
+
+        setSyncing(true);
+        setSyncMsg('');
+        try {
+            const res = await apiJson(`/api/projects/${id}/sync`, {
+                method: 'POST',
+                body: JSON.stringify({ email: project?.email, password }),
+            });
+            setStats(res.snapshot || stats);
+            setSyncMsg('Synced successfully!');
+        } catch (err) {
+            setSyncMsg(`Sync failed: ${err.message}`);
+        } finally {
+            setSyncing(false);
+            setTimeout(() => setSyncMsg(''), 5000);
+        }
+    };
 
     const accent = 'var(--c-accent)';
 
@@ -131,6 +154,23 @@ export default function ProjectDetailPage() {
                 <div className="pdp-nav-actions">
                     <button className="btn btn-subtle icon-btn" title="Share"><Share2 size={16} /></button>
                     <button className="btn btn-subtle icon-btn" title="Settings"><Sliders size={16} /></button>
+                    {project?.mcp_url && (
+                        <button
+                            className="btn btn-subtle"
+                            style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: '0.8rem' }}
+                            onClick={handleSync}
+                            disabled={syncing}
+                            title="Pull latest data from platform"
+                        >
+                            <RefreshCw size={14} className={syncing ? 'spinning' : ''} />
+                            {syncing ? 'Syncing…' : 'Sync Now'}
+                        </button>
+                    )}
+                    {syncMsg && (
+                        <span style={{ fontSize: '0.75rem', color: syncMsg.startsWith('Sync failed') ? 'var(--c-red)' : 'var(--c-green)', fontWeight: 600 }}>
+                            {syncMsg}
+                        </span>
+                    )}
                 </div>
             </nav>
 
