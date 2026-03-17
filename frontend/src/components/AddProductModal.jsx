@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
 import { X, Check } from 'lucide-react';
+import { api } from '../utils/api';
 import '../styles/AddProductModal.css';
 
 const empty = { name: '', mcpUrl: '', status: 'Active', email: '', password: '', description: '', liveUrl: '', gitRepo: '' };
@@ -36,10 +37,9 @@ export default function AddProductModal({ onClose, onAddProject }) {
         setConnecting(true);
 
         try {
-            const res = await fetch('/api/projects', {
+            const res = await api('/api/projects', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(form)
+                body: JSON.stringify(form),
             });
             const data = await res.json();
 

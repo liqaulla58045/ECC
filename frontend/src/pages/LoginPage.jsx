@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Eye, EyeOff } from 'lucide-react';
+import { useUser } from '../context/UserContext';
 import '../styles/LoginPage.css';
 
 export default function LoginPage() {
     const navigate = useNavigate();
+    const { login } = useUser();
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [showPw, setShowPw] = useState(false);
@@ -22,35 +24,50 @@ export default function LoginPage() {
         return () => clearInterval(id);
     }, []);
 
-    const handleLogin = (e) => {
+    const handleLogin = async (e) => {
         e.preventDefault();
         setError('');
         if (!username || !password) { setError('Please fill in both fields.'); return; }
-        if (username === 'chairman' && password === 'chairman@123') {
-            setLoading(true);
-            setTimeout(() => navigate('/dashboard'), 1400);
-        } else {
-            setError('Incorrect credentials. Hint: chairman / chairman@123');
+
+        setLoading(true);
+        try {
+            const res = await fetch('/api/auth/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, password }),
+            });
+
+            const data = await res.json();
+
+            if (!res.ok) {
+                setError(data.error || 'Invalid credentials.');
+                return;
+            }
+
+            login(data.token, data.user);
+            navigate('/dashboard');
+        } catch {
+            setError('Cannot connect to server. Make sure the backend is running.');
+        } finally {
+            setLoading(false);
         }
     };
 
     return (
         <div className="lp-root">
-            {/* Full Screen Background Wrapper */}
             <div className="lp-bg-wrapper">
                 <img
-                    src="/executive_office_login_bg_1773033747510.png"
-                    className="lp-bg-image"
-                    alt="Executive Workspace"
+                    src="/rooman-logo.png"
+                    className="lp-bg-image lp-bg-logo"
+                    alt="Rooman Background"
                 />
                 <div className="lp-bg-overlay"></div>
             </div>
 
-            {/* Centered Login Card */}
             <div className="lp-centered-content">
                 <div className="lp-form-wrap anim-scale-in">
                     <div className="lp-brand anim-fade-up">
-                        <div className="lp-brand-mark">ECC</div>
+                        <img src="/rooman-logo.png" className="lp-brand-logo" alt="Rooman Logo" />
                         <span className="lp-brand-name">Enterprise Command Center</span>
                     </div>
 
@@ -66,7 +83,7 @@ export default function LoginPage() {
                                     id="uname"
                                     className={`lp-input ${error ? 'lp-input--err' : ''}`}
                                     type="text"
-                                    placeholder="e.g. chairman"
+                                    placeholder="username"
                                     value={username}
                                     onChange={e => { setUsername(e.target.value); setError(''); }}
                                     autoComplete="username"
@@ -105,16 +122,6 @@ export default function LoginPage() {
                     </p>
                 </div>
             </div>
-        </div>
-    );
-}
-
-function StatTile({ label, value, delta }) {
-    return (
-        <div className="lp-stat-tile">
-            <p className="lp-stat-val">{value}</p>
-            <p className="lp-stat-label">{label}</p>
-            <p className="lp-stat-delta">{delta}</p>
         </div>
     );
 }

@@ -10,8 +10,6 @@ import {
     Search,
     Bell,
     MessageCircle,
-    ChevronDown,
-    Activity,
     Sidebar
 } from 'lucide-react';
 import { useUser } from '../context/UserContext';
@@ -20,7 +18,7 @@ import '../styles/DashboardPage.css';
 export default function Layout() {
     const navigate = useNavigate();
     const location = useLocation();
-    const { user } = useUser();
+    const { user, logout } = useUser();
     const [isCollapsed, setIsCollapsed] = useState(false);
     const getFormattedDate = () => {
         return new Date().toLocaleDateString('en-GB', {
@@ -60,8 +58,7 @@ export default function Layout() {
                         <Sidebar size={20} />
                     </div>
                     <div className="db-sidebar-brand-group">
-                        <Activity className="db-sidebar-logo-icon" size={20} />
-                        <span className="db-sidebar-brand">ECC Dashboard</span>
+                        <img src="/rooman-logo.png" className="db-sidebar-brand-logo" alt="Rooman" />
                     </div>
                 </div>
 
@@ -92,7 +89,7 @@ export default function Layout() {
                         </span>
                         <span>Settings</span>
                     </div>
-                    <div className="db-sidebar-link" onClick={() => navigate('/')}>
+                    <div className="db-sidebar-link" onClick={() => { logout(); navigate('/'); }}>
                         <span className="db-sidebar-icon-wrapper">
                             <LogOut className="db-sidebar-icon" />
                         </span>
@@ -126,7 +123,7 @@ export default function Layout() {
                             </div>
                         </div>
                         <div className="db-welcome">
-                            Welcome, {user.name.split(' ')[0]}
+                            Welcome, {user?.firstName || user?.username || 'Chairman'}
                         </div>
                     </div>
                 </header>
