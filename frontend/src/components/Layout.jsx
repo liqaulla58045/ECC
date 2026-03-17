@@ -113,15 +113,7 @@ export default function Layout() {
                                 placeholder="Search portfolio..."
                             />
                         </div>
-                        <div className="db-icons-group">
-                            <div className="db-icon-btn">
-                                <MessageCircle size={20} />
-                            </div>
-                            <div className="db-icon-btn">
-                                <Bell size={20} />
-                                <div className="db-bell-dot"></div>
-                            </div>
-                        </div>
+
                         <div className="db-welcome">
                             Welcome, {user?.firstName || user?.username || 'Chairman'}
                         </div>

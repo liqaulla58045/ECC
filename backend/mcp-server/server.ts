@@ -10,11 +10,13 @@ import express from 'express';
 import cors from 'cors';
 import fs from 'fs';
 import path from 'path';
+import { fileURLToPath } from 'url';
 
 // ─────────────────────────────────────────────
-// Load .env
+// Load .env from project root
 // ─────────────────────────────────────────────
-config();
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+config({ path: path.resolve(__dirname, '../../.env') });
 
 const SV_EMAIL = process.env.SV_EMAIL;
 const SV_PASSWORD = process.env.SV_PASSWORD;
@@ -576,6 +578,143 @@ app.post('/api/projects', async (req, res) => {
         res.json({ success: true, project: newProj });
     } catch (err: any) {
         console.error(err);
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// ─────────────────────────────────────────────
+// Claude AI Proxy — key stays server-side only
+// ─────────────────────────────────────────────
+app.post('/claude', async (req, res) => {
+    const apiKey = process.env.ANTHROPIC_API_KEY;
+    if (!apiKey) {
+        res.status(500).json({ error: 'ANTHROPIC_API_KEY is not configured in .env' });
+        return;
+    }
+
+    const { messages, system, max_tokens } = req.body;
+    if (!messages || !Array.isArray(messages)) {
+        res.status(400).json({ error: 'messages array is required' });
+        return;
+    }
+
+    try {
+        const response = await fetch('https://api.anthropic.com/v1/messages', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'x-api-key': apiKey,
+                'anthropic-version': '2023-06-01',
+            },
+            body: JSON.stringify({
+                model: 'claude-sonnet-4-6',
+                max_tokens: max_tokens || 1024,
+                system,
+                messages,
+            }),
+        });
+
+        const data = await response.json() as any;
+
+        if (!response.ok) {
+            console.error('Anthropic API error:', data);
+            res.status(response.status).json({ error: data?.error?.message || 'Anthropic API error' });
+            return;
+        }
+
+        res.json(data);
+    } catch (err: any) {
+        console.error('Claude proxy error:', err.message);
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// ─────────────────────────────────────────────
+// OpenAI Chart Proxy — fetches live stats + generates chart JSON
+// ─────────────────────────────────────────────
+app.post('/openai', async (req, res) => {
+    const apiKey = process.env.OPENAI_API_KEY;
+    if (!apiKey) {
+        res.status(500).json({ error: 'OPENAI_API_KEY is not configured in .env' });
+        return;
+    }
+
+    const { query } = req.body;
+    if (!query) {
+        res.status(400).json({ error: 'query is required' });
+        return;
+    }
+
+    // Fetch live stats from all connected projects
+    const projects = loadProjects();
+    const statsResults = await Promise.allSettled(
+        projects.map(async (p: any) => {
+            try {
+                const stats = await apiGet('/api/admin/stats', p.id);
+                return { project: p.name, ...(stats as object) };
+            } catch {
+                return { project: p.name, error: 'unavailable' };
+            }
+        })
+    );
+    const liveData = statsResults
+        .filter(r => r.status === 'fulfilled')
+        .map((r: any) => r.value);
+
+    const systemPrompt = `You are a data visualization expert for an enterprise admin dashboard.
+When given a user request and live data, you return ONLY a JSON object for rendering a chart.
+The JSON must follow this exact schema:
+{
+  "chartType": "bar" | "line" | "pie" | "area",
+  "title": "string",
+  "description": "string",
+  "data": [ { "name": "string", "value": number, ...otherKeys } ],
+  "xKey": "name",
+  "yKeys": [ { "key": "string", "color": "#hex", "name": "string" } ]
+}
+Rules:
+- For pie charts: data items must only have "name" and "value" keys
+- For bar/line/area: data items must have the xKey field and all yKey fields
+- Use real numbers from the live data provided
+- Use these colors: #1C7ED6, #2B8A3E, #E67700, #6741D9, #E03131, #0CA678
+- Return ONLY valid JSON, no markdown, no explanation`;
+
+    try {
+        const response = await fetch('https://api.openai.com/v1/chat/completions', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${apiKey}`,
+            },
+            body: JSON.stringify({
+                model: 'gpt-4o-mini',
+                response_format: { type: 'json_object' },
+                messages: [
+                    { role: 'system', content: systemPrompt },
+                    { role: 'user', content: `User request: "${query}"\n\nLive project data:\n${JSON.stringify(liveData, null, 2)}` }
+                ],
+                max_tokens: 1024,
+            }),
+        });
+
+        const data = await response.json() as any;
+
+        if (!response.ok) {
+            console.error('OpenAI API error:', data);
+            res.status(response.status).json({ error: data?.error?.message || 'OpenAI API error' });
+            return;
+        }
+
+        const raw = data?.choices?.[0]?.message?.content;
+        if (!raw) {
+            res.status(500).json({ error: 'OpenAI returned empty response' });
+            return;
+        }
+
+        const chartData = JSON.parse(raw);
+        res.json({ chartData });
+    } catch (err: any) {
+        console.error('OpenAI proxy error:', err.message);
         res.status(500).json({ error: err.message });
     }
 });
