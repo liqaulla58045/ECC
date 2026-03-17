@@ -21,6 +21,7 @@
     display: flex;
     justify-content: flex-end;
     background: rgba(25, 23, 31, 0.35);
+    -webkit-backdrop-filter: blur(4px);
     backdrop-filter: blur(4px);
 }
 
@@ -199,6 +200,7 @@
     font-weight: 500;
     cursor: pointer;
     transition: all 0.18s;
+    -webkit-user-select: none;
     user-select: none;
 }
 
@@ -263,6 +265,130 @@
 
 .apm-success-btn {
     margin-top: 8px;
+}
+
+/* Hint text */
+.apm-hint {
+    font-size: 0.71rem;
+    color: var(--c-text-3);
+    margin-top: 2px;
+}
+
+/* ── Live Progress ────────────────────────────── */
+.apm-progress {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 36px 28px;
+    gap: 24px;
+}
+
+.apm-progress-title {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--c-text);
+    line-height: 1.4;
+}
+
+.apm-progress-sub {
+    font-size: 0.8rem;
+    color: var(--c-text-3);
+    margin-top: -16px;
+}
+
+.apm-steps {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.apm-step {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    opacity: 0.4;
+    transition: opacity 0.3s, transform 0.3s;
+}
+
+.apm-step--active,
+.apm-step--done {
+    opacity: 1;
+}
+
+.apm-step--active {
+    transform: translateX(4px);
+}
+
+.apm-step-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: var(--r-sm);
+    background: var(--c-raised);
+    border: 1.5px solid var(--c-border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--c-text-3);
+    flex-shrink: 0;
+    transition: background 0.3s, border-color 0.3s, color 0.3s;
+}
+
+.apm-step--active .apm-step-icon {
+    background: var(--c-accent-bg);
+    border-color: var(--c-accent-bd);
+    color: var(--c-accent);
+}
+
+.apm-step--done .apm-step-icon {
+    background: var(--c-green-bg);
+    border-color: rgba(22, 153, 74, 0.2);
+    color: var(--c-green);
+}
+
+.apm-step-label {
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--c-text-2);
+}
+
+.apm-step--active .apm-step-label,
+.apm-step--done   .apm-step-label {
+    color: var(--c-text);
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+.apm-spin {
+    animation: spin 1s linear infinite;
+}
+
+.apm-progress-bar-wrap {
+    height: 4px;
+    background: var(--c-raised);
+    border-radius: 2px;
+    overflow: hidden;
+    margin-top: auto;
+}
+
+.apm-progress-bar {
+    height: 100%;
+    background: var(--c-accent);
+    border-radius: 2px;
+    transition: width 0.8s ease;
+}
+
+/* Sync warning in success state */
+.apm-sync-warn {
+    font-size: 0.78rem;
+    color: var(--c-yellow, #E67700);
+    background: rgba(230, 119, 0, 0.08);
+    border: 1px solid rgba(230, 119, 0, 0.2);
+    border-radius: var(--r-sm);
+    padding: 10px 14px;
+    line-height: 1.5;
+    text-align: left;
+    width: 100%;
 }
 
 @media (max-width: 560px) {

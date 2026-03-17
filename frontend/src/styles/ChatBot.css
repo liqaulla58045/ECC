@@ -10,9 +10,12 @@
 .cb-root {
     display: flex;
     flex-direction: column;
-    min-height: calc(100vh - 70px - 100px);
+    height: calc(100vh - 70px);
     width: 100%;
+    max-width: 1100px;
+    margin: 0 auto;
     position: relative;
+    box-sizing: border-box;
 }
 
 .cb-root--landing {
@@ -87,6 +90,7 @@
 
 .cb-landing-input-box {
     background: rgba(255, 255, 255, 0.8);
+    -webkit-backdrop-filter: blur(8px);
     backdrop-filter: blur(8px);
     border: 1px solid var(--c-border);
     border-radius: 16px;
@@ -321,7 +325,7 @@
 .cb-messages {
     flex: 1;
     overflow-y: auto;
-    padding: 32px 0;
+    padding: 24px 4px;
     display: flex;
     flex-direction: column;
     gap: 24px;
@@ -601,6 +605,13 @@
     font-style: italic;
 }
 
+/* ── HISTORY BACKDROP ── */
+.cb-hd-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 299;
+}
+
 /* ── HISTORY DROPDOWN ── */
 .cb-history-dropdown {
     position: absolute;
@@ -653,6 +664,25 @@
 }
 .cb-hd-close:hover { background: var(--c-accent-bg); color: var(--c-accent); }
 
+.cb-hd-clear-all {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 7px 12px;
+    margin: 8px 8px 4px;
+    width: calc(100% - 16px);
+    border: 1px solid #FFE3E3;
+    border-radius: 8px;
+    background: #FFF5F5;
+    color: #E03131;
+    font-size: 0.78rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s;
+}
+.cb-hd-clear-all:hover { background: #FFE3E3; border-color: #E03131; }
+
 .cb-hd-list {
     list-style: none;
     margin: 0;
@@ -701,11 +731,8 @@
 .cb-hd-actions {
     display: flex;
     gap: 2px;
-    opacity: 0;
-    transition: opacity 0.12s;
     flex-shrink: 0;
 }
-.cb-hd-item:hover .cb-hd-actions { opacity: 1; }
 
 .cb-hd-btn {
     background: none;

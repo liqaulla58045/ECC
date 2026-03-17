@@ -566,8 +566,8 @@ app.get('/api/projects', (req, res) => {
 
 app.post('/api/projects', async (req, res) => {
     try {
-        const { name, mcpUrl, status, email, password, description, liveUrl, gitRepo } = req.body;
-        const id = `proj-${Date.now()}`;
+        const { id: providedId, name, mcpUrl, status, email, password, description, liveUrl, gitRepo } = req.body;
+        const id = providedId || `proj-${Date.now()}`;
 
         await spinUpSession(id, mcpUrl, email, password);
         const projects = loadProjects();

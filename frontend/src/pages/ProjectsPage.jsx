@@ -1,33 +1,33 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
-    Search, Plus, LayoutGrid, List, ShieldAlert, ArrowUpRight,
+    Search, Plus, LayoutGrid, List, ArrowUpRight,
     Users, BookOpen, Award, TrendingUp, Clock, CheckCircle,
     XCircle, AlertCircle, RefreshCw, Filter
 } from 'lucide-react';
+import { apiJson } from '../utils/api';
 import AddProductModal from '../components/AddProductModal';
 import '../styles/ProjectsPage.css';
 
 const STATUS_META = {
-    active:      { label: 'Active',      color: '#2B8A3E', bg: '#EBFBEE', icon: <CheckCircle size={12} /> },
+    active:       { label: 'Active',      color: '#2B8A3E', bg: '#EBFBEE', icon: <CheckCircle size={12} /> },
     'in progress':{ label: 'In Progress', color: '#1C7ED6', bg: '#E7F5FF', icon: <Clock size={12} /> },
-    planning:    { label: 'Planning',    color: '#E67700', bg: '#FFF3BF', icon: <AlertCircle size={12} /> },
-    error:       { label: 'Offline',     color: '#E03131', bg: '#FFF5F5', icon: <XCircle size={12} /> },
-    beta:        { label: 'Beta',        color: '#6741D9', bg: '#F3F0FF', icon: <TrendingUp size={12} /> },
+    planning:     { label: 'Planning',    color: '#E67700', bg: '#FFF3BF', icon: <AlertCircle size={12} /> },
+    error:        { label: 'Offline',     color: '#E03131', bg: '#FFF5F5', icon: <XCircle size={12} /> },
+    beta:         { label: 'Beta',        color: '#6741D9', bg: '#F3F0FF', icon: <TrendingUp size={12} /> },
 };
 
 function getStatusMeta(status = '') {
     return STATUS_META[status.toLowerCase()] || STATUS_META['planning'];
 }
 
-function StatCard({ icon, label, value, sub, color }) {
+function StatCard({ icon, label, value, color }) {
     return (
         <div className="pp-stat-card">
             <div className="pp-stat-icon" style={{ background: `${color}15`, color }}>{icon}</div>
             <div>
                 <p className="pp-stat-value">{value}</p>
                 <p className="pp-stat-label">{label}</p>
-                {sub && <p className="pp-stat-sub">{sub}</p>}
             </div>
         </div>
     );
@@ -60,9 +60,7 @@ function ProjectListItem({ project, onClick }) {
                     </div>
                     <span className="pp-prog-label">{project.progress}%</span>
                 </div>
-                <button className="pp-view-btn">
-                    View <ArrowUpRight size={14} />
-                </button>
+                <button className="pp-view-btn">View <ArrowUpRight size={14} /></button>
             </div>
         </div>
     );
@@ -112,33 +110,38 @@ export default function ProjectsPage() {
 
     async function fetchProjects() {
         try {
-            const res = await fetch('/api/projects');
-            if (res.status === 401) throw new Error('401');
-            if (!res.ok) throw new Error('Failed to reach backend');
-            const configs = await res.json();
+            const configs = await apiJson('/api/projects');
 
             const hydrated = await Promise.all(configs.map(async (proj) => {
                 try {
-                    const stats = await fetch(`/api/projects/${proj.id}/proxy/api/admin/stats`);
-                    if (!stats.ok) throw new Error();
-                    const s = await stats.json();
+                    const stats = await apiJson(`/api/projects/${proj.id}/stats`);
                     return {
-                        id: proj.id, name: proj.name, category: proj.category || 'Platform',
-                        status: proj.status || 'Active', description: proj.description || '',
-                        progress: Math.min(100, Math.round(((s.totalLearners || 0) / 3000) * 100)) || 72,
+                        id: proj.id,
+                        name: proj.name,
+                        category: proj.category || 'Platform',
+                        status: proj.status || 'Active',
+                        description: proj.description || '',
+                        progress: proj.progress || 0,
                         kpis: {
-                            totalLearners: s.totalLearners || 0, totalTeams: s.totalTeams || 0,
-                            totalMentors: s.totalMentors || 0, totalApplications: s.totalApplications || 0,
-                        }
+                            totalLearners:    stats?.total_learners     || 0,
+                            totalTeams:       stats?.total_teams        || 0,
+                            totalMentors:     stats?.total_mentors      || 0,
+                            totalApplications: stats?.total_applications || 0,
+                        },
                     };
                 } catch {
                     return {
-                        id: proj.id, name: proj.name, category: 'Offline',
-                        status: 'Error', description: 'Could not sync with MCP server.',
-                        progress: 0, kpis: { totalLearners: 0, totalTeams: 0, totalMentors: 0, totalApplications: 0 }
+                        id: proj.id,
+                        name: proj.name,
+                        category: proj.category || 'Platform',
+                        status: proj.status || 'Active',
+                        description: proj.description || '',
+                        progress: proj.progress || 0,
+                        kpis: { totalLearners: 0, totalTeams: 0, totalMentors: 0, totalApplications: 0 },
                     };
                 }
             }));
+
             setProjects(hydrated);
             setError(null);
         } catch (e) {
@@ -158,7 +161,9 @@ export default function ProjectsPage() {
     const filtered = projects
         .filter(p => {
             const q = search.toLowerCase();
-            const matchSearch = p.name.toLowerCase().includes(q) || p.description.toLowerCase().includes(q) || p.category.toLowerCase().includes(q);
+            const matchSearch = p.name.toLowerCase().includes(q) ||
+                (p.description || '').toLowerCase().includes(q) ||
+                (p.category || '').toLowerCase().includes(q);
             const matchStatus = statusFilter === 'All' || p.status.toLowerCase() === statusFilter.toLowerCase();
             return matchSearch && matchStatus;
         })
@@ -190,16 +195,14 @@ export default function ProjectsPage() {
                 </div>
             </div>
 
-            {/* Stats Row */}
             <div className="pp-stats-row">
-                <StatCard icon={<LayoutGrid size={18} />} label="Total Projects" value={projects.length} color="#6741D9" />
-                <StatCard icon={<CheckCircle size={18} />} label="Active" value={activeCount} color="#2B8A3E" />
-                <StatCard icon={<Users size={18} />} label="Total Learners" value={totalLearners.toLocaleString()} color="#1C7ED6" />
-                <StatCard icon={<BookOpen size={18} />} label="Total Teams" value={totalTeams} color="#E67700" />
-                <StatCard icon={<Award size={18} />} label="Total Mentors" value={totalMentors} color="#E03131" />
+                <StatCard icon={<LayoutGrid size={18} />}  label="Total Projects" value={projects.length}                   color="#6741D9" />
+                <StatCard icon={<CheckCircle size={18} />} label="Active"         value={activeCount}                       color="#2B8A3E" />
+                <StatCard icon={<Users size={18} />}       label="Total Learners" value={totalLearners.toLocaleString()}    color="#1C7ED6" />
+                <StatCard icon={<BookOpen size={18} />}    label="Total Teams"    value={totalTeams}                        color="#E67700" />
+                <StatCard icon={<Award size={18} />}       label="Total Mentors"  value={totalMentors}                      color="#E03131" />
             </div>
 
-            {/* Toolbar */}
             <div className="pp-toolbar">
                 <div className="pp-search">
                     <Search size={15} className="pp-search-icon" />
@@ -224,33 +227,27 @@ export default function ProjectsPage() {
                 </div>
             </div>
 
-            {/* Content */}
             <div className="pp-content">
                 {loading ? (
                     <div className="pp-empty">
                         <RefreshCw size={32} className="spinning" style={{ color: 'var(--c-accent)' }} />
                         <p>Loading project data...</p>
                     </div>
-                ) : error === '401' ? (
-                    <div className="pp-empty pp-auth-error">
-                        <ShieldAlert size={40} color="var(--c-accent)" />
-                        <h3>Backend credentials required</h3>
-                        <p>Add your credentials to <code>.env</code> and restart the backend server.</p>
-                        <pre>SV_EMAIL=your@email.com{'\n'}SV_PASSWORD=yourpassword</pre>
-                    </div>
                 ) : error ? (
                     <div className="pp-empty"><p style={{ color: '#E03131' }}>⚠ {error}</p></div>
                 ) : filtered.length === 0 ? (
-                    <div className="pp-empty"><p>No projects match your filters.</p></div>
+                    <div className="pp-empty">
+                        <p>{projects.length === 0 ? 'No projects yet. Add your first project.' : 'No projects match your filters.'}</p>
+                    </div>
                 ) : view === 'grid' ? (
                     <div className="pp-grid">
-                        {filtered.map((p, i) => (
+                        {filtered.map(p => (
                             <ProjectGridItem key={p.id} project={p} onClick={() => navigate(`/project/${p.id}`)} />
                         ))}
                     </div>
                 ) : (
                     <div className="pp-list">
-                        {filtered.map((p) => (
+                        {filtered.map(p => (
                             <ProjectListItem key={p.id} project={p} onClick={() => navigate(`/project/${p.id}`)} />
                         ))}
                     </div>

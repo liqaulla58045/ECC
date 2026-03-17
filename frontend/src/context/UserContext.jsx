@@ -1,45 +1,39 @@
 import { createContext, useState, useContext } from 'react';
+import { saveToken, clearToken } from '../utils/api';
 
 const UserContext = createContext();
-
-const DEFAULT_USER = {
-    name: '',
-    role: 'Administrator',
-    email: '',
-    bio: '',
-    avatar: null,
-    phone: '',
-    jobTitle: '',
-    department: '',
-    location: '',
-    website: '',
-    linkedin: '',
-    username: '',
-    dateOfBirth: '',
-    country: '',
-    organization: ''
-};
 
 export function UserProvider({ children }) {
     const [user, setUser] = useState(() => {
         try {
-            const saved = localStorage.getItem('ecc_user_profile');
-            return saved ? { ...DEFAULT_USER, ...JSON.parse(saved) } : DEFAULT_USER;
+            const saved = localStorage.getItem('ecc_user');
+            return saved ? JSON.parse(saved) : null;
         } catch {
-            return DEFAULT_USER;
+            return null;
         }
     });
+
+    const login = (token, userData) => {
+        saveToken(token);
+        localStorage.setItem('ecc_user', JSON.stringify(userData));
+        setUser(userData);
+    };
+
+    const logout = () => {
+        clearToken();
+        setUser(null);
+    };
 
     const updateUser = (newData) => {
         setUser(prev => {
             const updated = { ...prev, ...newData };
-            localStorage.setItem('ecc_user_profile', JSON.stringify(updated));
+            localStorage.setItem('ecc_user', JSON.stringify(updated));
             return updated;
         });
     };
 
     return (
-        <UserContext.Provider value={{ user, updateUser }}>
+        <UserContext.Provider value={{ user, login, logout, updateUser }}>
             {children}
         </UserContext.Provider>
     );

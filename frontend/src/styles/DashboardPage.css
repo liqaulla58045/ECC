@@ -87,6 +87,14 @@
     letter-spacing: -0.02em;
 }
 
+.db-sidebar-brand-logo {
+    height: 36px;
+    width: auto;
+    max-width: 160px;
+    object-fit: contain;
+    transition: opacity 0.2s;
+}
+
 .db-sidebar-profile {
     display: flex;
     align-items: center;
@@ -370,6 +378,7 @@
 .db-topbar {
     height: 70px;
     background: rgba(248, 248, 248, 0.8);
+    -webkit-backdrop-filter: blur(12px);
     backdrop-filter: blur(12px);
     display: flex;
     align-items: center;
