@@ -1,11 +1,13 @@
 import { useState } from 'react';
 import { createPortal } from 'react-dom';
-import { X, Check, Wand2 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { X, Check } from 'lucide-react';
 import '../styles/AddProductModal.css';
 
-const empty = { name: '', mcpUrl: '', status: 'Active', email: '', password: '', description: '' };
+const empty = { name: '', mcpUrl: '', status: 'Active', email: '', password: '', description: '', liveUrl: '', gitRepo: '' };
 
 export default function AddProductModal({ onClose, onAddProject }) {
+    const navigate = useNavigate();
     const [form, setForm] = useState({ ...empty });
     const [errors, setErrors] = useState({});
     const [done, setDone] = useState(false);
@@ -51,12 +53,15 @@ export default function AddProductModal({ onClose, onAddProject }) {
                     category: 'CONNECTED PLATFORM',
                     status: form.status,
                     description: form.description,
+                    liveUrl: form.liveUrl,
+                    gitRepo: form.gitRepo,
                     progress: 100,
                     startDate: 'Active',
                     endDate: 'Present',
                     kpis: { totalLearners: 0, totalTeams: 0, totalMentors: 0, newAppsThisMonth: 0, seedDeployed: '₹0' }
                 });
             }
+            setForm(f => ({ ...f, id: data.project.id }));
             setDone(true);
         } catch (err) {
             setErrors({ mcpUrl: err.message });
@@ -95,7 +100,10 @@ export default function AddProductModal({ onClose, onAddProject }) {
                         <p className="apm-success-desc">
                             <strong>{form.name}</strong> has been integrated. Its data will now sync to the Chairman Dashboard.
                         </p>
-                        <button className="btn btn-solid apm-success-btn" onClick={onClose}>Done</button>
+                        <button className="btn btn-solid apm-success-btn" onClick={() => {
+                            onClose();
+                            navigate(`/project/${form.id}`);
+                        }}>Go to Project</button>
                     </div>
                 ) : (
 
@@ -151,6 +159,19 @@ export default function AddProductModal({ onClose, onAddProject }) {
                                     onChange={e => set('description', e.target.value)}
                                 />
                             </Field>
+
+                            <div className="apm-row">
+                                <Field label="Live URL (Optional)">
+                                    <input className="apm-input"
+                                        placeholder="https://yourapp.com" value={form.liveUrl}
+                                        onChange={e => set('liveUrl', e.target.value)} />
+                                </Field>
+                                <Field label="Git Repository (Optional)">
+                                    <input className="apm-input"
+                                        placeholder="https://github.com/..." value={form.gitRepo}
+                                        onChange={e => set('gitRepo', e.target.value)} />
+                                </Field>
+                            </div>
 
                         </div>
 

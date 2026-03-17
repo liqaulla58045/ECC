@@ -37,10 +37,11 @@ export default function ProjectDetailPage() {
     useEffect(() => {
         async function fetchProjectData() {
             try {
-                // Fetch cohort list and problem statements 
-                const [cohortsRes, productsRes] = await Promise.all([
+                // Fetch projects list as well
+                const [cohortsRes, productsRes, projectsRes] = await Promise.all([
                     fetch('/api/cohorts'),
-                    fetch('/api/problem-statements?status=PUBLISHED')
+                    fetch('/api/problem-statements?status=PUBLISHED'),
+                    fetch('/api/projects')
                 ]);
 
                 if (cohortsRes.status === 401 || productsRes.status === 401) {
@@ -51,6 +52,10 @@ export default function ProjectDetailPage() {
 
                 const cohorts = await cohortsRes.json();
                 const productsData = await productsRes.json();
+                const projectsConfig = await projectsRes.json();
+
+                // Find matching project in our local database
+                const extraData = Array.isArray(projectsConfig) ? projectsConfig.find(p => p.id === id) : null;
 
                 // Find matching cohort or default to the first one available
                 const cohortData = (Array.isArray(cohorts) ? cohorts.find(c => c.cohortId === id || c.id === id) : null)
@@ -68,6 +73,8 @@ export default function ProjectDetailPage() {
                         startDate: 'Mar 2026',
                         endDate: 'Aug 2026',
                         progress: 45,
+                        liveUrl: '#',
+                        gitRepo: '#',
                         kpis: {
                             totalLearners: 1250,
                             totalTeams: 45,
@@ -106,6 +113,8 @@ export default function ProjectDetailPage() {
                         startDate: 'Oct 2026',
                         endDate: 'Mar 2027',
                         progress: 10,
+                        liveUrl: '#',
+                        gitRepo: '#',
                         kpis: {
                             totalLearners: 0,
                             totalTeams: 0,
@@ -138,7 +147,7 @@ export default function ProjectDetailPage() {
                     id: cohortData.cohortId || id,
                     name: cohortData.name || 'StartupVarsity Default',
                     category: 'STARTUP INCUBATION',
-                    description: `An active cohort focusing on ${cohortData.durationInWeeks || 12}-week structured incubation.`,
+                    description: extraData?.description || `An active cohort focusing on ${cohortData.durationInWeeks || 12}-week structured incubation.`,
                     status: cohortData.status || 'Active',
                     startDate: cohortData.startDate ? new Date(cohortData.startDate).toLocaleDateString() : 'Jan 2026',
                     endDate: cohortData.endDate ? new Date(cohortData.endDate).toLocaleDateString() : 'Present',
@@ -160,7 +169,8 @@ export default function ProjectDetailPage() {
                         { id: 2, type: 'team', text: '3 New Teams Onboarded', time: '4 days ago' },
                         { id: 3, type: 'mentor', text: 'Global Mentorship Session held', time: '1 week ago' }
                     ],
-                    liveUrl: 'https://example.com/demo', // Placeholder live URL
+                    liveUrl: extraData?.liveUrl || 'https://example.com/demo',
+                    gitRepo: extraData?.gitRepo || '#',
                     products: productsList,
                     team: [
                         { name: 'Dr. Rajesh Kumar', role: 'Chairman', avatar: 'RK' },
@@ -273,10 +283,16 @@ export default function ProjectDetailPage() {
                                 <ExternalLink size={18} style={{ marginRight: '8px' }} />
                                 Live Demo
                             </a>
-                            <button className="btn btn-subtle">
+                            <a
+                                href={project.gitRepo === '#' ? undefined : project.gitRepo}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="btn btn-subtle pd-repo-btn"
+                                style={project.gitRepo === '#' ? { opacity: 0.5, cursor: 'not-allowed' } : {}}
+                            >
                                 <Github size={18} style={{ marginRight: '8px' }} />
                                 Repository
-                            </button>
+                            </a>
                         </div>
                     </div>
                 </div>
