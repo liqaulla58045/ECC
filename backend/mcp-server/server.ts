@@ -564,12 +564,12 @@ app.get('/api/projects', (req, res) => {
 
 app.post('/api/projects', async (req, res) => {
     try {
-        const { name, mcpUrl, status, email, password, description } = req.body;
+        const { name, mcpUrl, status, email, password, description, liveUrl, gitRepo } = req.body;
         const id = `proj-${Date.now()}`;
 
         await spinUpSession(id, mcpUrl, email, password);
         const projects = loadProjects();
-        const newProj = { id, name, mcpUrl, email, status, description };
+        const newProj = { id, name, mcpUrl, email, status, description, liveUrl, gitRepo };
         projects.push(newProj);
         saveProjects(projects);
 

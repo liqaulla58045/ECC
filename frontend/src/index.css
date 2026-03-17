@@ -117,6 +117,48 @@ select {
 }
 
 /* ─────────────────────────────────────────────
+   COMPACT LAYOUT (body.dense)
+   Activated by the toggle in Settings → Appearance
+───────────────────────────────────────────── */
+
+/* Reduce base font */
+body.dense { font-size: 13px; }
+
+/* Sidebar nav items */
+body.dense .nav-item,
+body.dense .sidebar-link { padding: 6px 12px !important; }
+
+/* Cards and panels */
+body.dense .dashboard-card,
+body.dense .project-card,
+body.dense .rp-chart-card { padding: 14px 16px !important; }
+
+/* Table / list rows */
+body.dense .settings-list-item    { padding: 12px 18px !important; }
+body.dense .rp-summary-row        { padding: 8px 18px !important; }
+body.dense .rp-activity-row       { padding: 8px 0 !important; }
+
+/* KPI cards */
+body.dense .rp-kpi-card           { padding: 14px 16px !important; }
+body.dense .rp-kpi-value          { font-size: 1.4rem !important; }
+
+/* Section headings */
+body.dense .section-title         { font-size: 1.2rem !important; margin-bottom: 20px !important; }
+body.dense .rp-title              { font-size: 1.3rem !important; }
+
+/* Form inputs */
+body.dense .input-group input,
+body.dense .input-group textarea  { padding: 8px 10px !important; font-size: 0.875rem !important; }
+
+/* Gap between chart rows */
+body.dense .rp-charts-row         { gap: 12px !important; }
+body.dense .rp-kpi-row            { gap: 10px !important; }
+body.dense .rp-body               { gap: 14px !important; }
+
+/* Settings main area */
+body.dense .settings-main         { padding: 24px 32px !important; }
+
+/* ─────────────────────────────────────────────
    BUTTONS
 ───────────────────────────────────────────── */
 .btn {
