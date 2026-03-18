@@ -37,7 +37,7 @@ timeout /t 2 /nobreak >nul
 
 :: ── Start MCP Server
 echo  [3/4] Starting MCP Server on http://localhost:3002 ...
-start "ECC MCP Server" cmd /k "cd /d %~dp0backend\mcp-server && npm install --silent && npx playwright install chromium && echo  MCP Server starting... && npx tsx server.ts"
+start "ECC MCP Server" cmd /k "cd /d %~dp0backend\mcp-server && if not exist node_modules (echo  First run: installing MCP dependencies... && npm install --silent) else (echo  MCP dependencies already installed.) && if not exist "%USERPROFILE%\AppData\Local\ms-playwright" (echo  First run: installing Playwright Chromium... && npx playwright install chromium) else (echo  Playwright Chromium already installed.) && echo  MCP Server starting... && npx tsx server.ts"
 
 echo  Waiting for MCP Server to boot (Playwright takes ~10s)...
 timeout /t 10 /nobreak >nul

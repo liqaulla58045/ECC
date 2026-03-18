@@ -10,10 +10,39 @@ services:
     name: ecc-api
     runtime: node
     plan: free
-    buildCommand: >
-      cd frontend && npm install && npm run build &&
-      cd ../backend/api && npm install && npm run build &&
-      mkdir -p dist/public && cp -r ../../frontend/dist/. dist/public/
+    buildCommand: |
+      set -eu
+      echo "[ecc-api] Building frontend..."
+      cd frontend
+      npm install
+      npm run build
+
+      if [ ! -f dist/index.html ]; then
+        echo "[ecc-api] ERROR: frontend build did not produce dist/index.html"
+        exit 1
+      fi
+
+      echo "[ecc-api] Building backend API..."
+      cd ../backend/api
+      npm install
+      npm run build
+
+      if [ ! -d dist ]; then
+        echo "[ecc-api] ERROR: backend build did not produce dist directory"
+        exit 1
+      fi
+
+      echo "[ecc-api] Copying frontend dist into backend/api/dist/public..."
+      mkdir -p dist/public
+      rm -rf dist/public/*
+      cp -a ../../frontend/dist/. dist/public/
+
+      if [ ! -f dist/public/index.html ]; then
+        echo "[ecc-api] ERROR: frontend assets were not copied into backend/api/dist/public"
+        exit 1
+      fi
+
+      echo "[ecc-api] Build and asset copy complete."
     startCommand: node backend/api/dist/index.js
     envVars:
       - key: NODE_ENV
