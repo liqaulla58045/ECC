@@ -1,16 +1,12 @@
 import express from 'express';
 import cors from 'cors';
 import path from 'path';
-import { fileURLToPath } from 'url';
 import { config } from 'dotenv';
 import { runMigrations } from './db/index.js';
 import { errorHandler } from './middleware/errorHandler.js';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname  = path.dirname(__filename);
-// In production the compiled file is at backend/api/dist/index.js
-// frontend/dist is 3 levels up then into frontend/dist
-const FRONTEND_DIST = path.join(__dirname, '../../../frontend/dist');
+// process.cwd() = repo root when Render runs: node backend/api/dist/index.js
+const FRONTEND_DIST = path.join(process.cwd(), 'frontend', 'dist');
 
 import authRouter          from './routes/auth.js';
 import usersRouter         from './routes/users.js';
