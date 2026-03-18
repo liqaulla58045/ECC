@@ -70,7 +70,12 @@ app.use('/',                  aiRouter);     // /claude, /openai
 
 // ─── SPA fallback (must be after all API routes) ─
 if (process.env.NODE_ENV === 'production') {
-    app.get('*', (_req, res) => {
+    // Only serve index.html for non-asset routes (let assets 404 cleanly)
+    app.get('*', (req, res) => {
+        if (/\.(js|css|ico|png|jpg|jpeg|svg|woff|woff2|ttf|map)$/.test(req.path)) {
+            res.status(404).end();
+            return;
+        }
         res.sendFile(path.join(FRONTEND_DIST, 'index.html'), (err) => {
             if (err) res.status(500).json({ error: 'Frontend not built', dist: FRONTEND_DIST });
         });
