@@ -218,6 +218,8 @@ CREATE TABLE IF NOT EXISTS chatbot_enquiries (
 -- ─────────────────────────────────────────────
 ALTER TABLE projects ADD COLUMN IF NOT EXISTS stats_path VARCHAR(500) NOT NULL DEFAULT '/api/admin/stats';
 ALTER TABLE metrics_snapshots ADD COLUMN IF NOT EXISTS raw_data JSONB;
+-- Expand avatar to store base64 data URLs
+ALTER TABLE users ALTER COLUMN avatar TYPE TEXT;
 
 -- ─────────────────────────────────────────────
 -- INDEXES (for common query patterns)

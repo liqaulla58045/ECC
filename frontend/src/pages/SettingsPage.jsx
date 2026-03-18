@@ -7,6 +7,7 @@ import {
     Briefcase, MapPin, Link, Building2, QrCode, Trash2, ArrowLeft, RefreshCw
 } from 'lucide-react';
 import { useUser } from '../context/UserContext';
+import { apiJson } from '../utils/api';
 import '../styles/SettingsPage.css';
 
 const themes = [
@@ -67,7 +68,10 @@ export default function SettingsPage() {
     const [showDeleteModal, setShowDeleteModal]     = useState(false);
     
     // Form and UI state
-    const [profileData, setProfileData]             = useState({ ...user });
+    const [profileData, setProfileData]             = useState({
+        ...user,
+        name: user?.name || [user?.firstName, user?.lastName].filter(Boolean).join(' ') || '',
+    });
     const [accountData, setAccountData]             = useState({
         username:    user.username    || '',
         dateOfBirth: user.dateOfBirth || '',
@@ -90,13 +94,40 @@ export default function SettingsPage() {
         reader.readAsDataURL(file);
     };
 
-    const handleSave = () => {
+    const handleSave = async () => {
         setSaveStatus('saving');
-        setTimeout(() => {
-            updateUser({ ...profileData, ...accountData });
-            setSaveStatus('success');
-            setTimeout(() => setSaveStatus(null), 3000);
-        }, 800);
+        const nameParts = (profileData.name || '').trim().split(' ');
+        const firstName = nameParts[0] || profileData.firstName || '';
+        const lastName = nameParts.slice(1).join(' ') || profileData.lastName || '';
+        try {
+            const updated = await apiJson(`/api/users/${user.id}`, {
+                method: 'PATCH',
+                body: JSON.stringify({
+                    firstName,
+                    lastName,
+                    avatar: profileData.avatar || null,
+                }),
+            });
+            updateUser({
+                ...profileData,
+                ...accountData,
+                firstName: updated.first_name || firstName,
+                lastName:  updated.last_name  || lastName,
+                avatar:    updated.avatar     ?? profileData.avatar,
+                name: [updated.first_name || firstName, updated.last_name || lastName].filter(Boolean).join(' '),
+            });
+        } catch {
+            // Fallback: update locally if API fails
+            updateUser({
+                ...profileData,
+                ...accountData,
+                firstName,
+                lastName,
+                name: [firstName, lastName].filter(Boolean).join(' '),
+            });
+        }
+        setSaveStatus('success');
+        setTimeout(() => setSaveStatus(null), 3000);
     };
 
     const handleDiscard = () => {

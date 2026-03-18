@@ -6,6 +6,7 @@
   "main": "dist/index.js",
   "scripts": {
     "build": "tsc",
+    "build:all": "cd ../../frontend && npm install && npm run build && cd ../backend/api && npm run build",
     "start": "node dist/index.js",
     "dev": "npx tsx watch src/index.ts",
     "db:migrate": "npx tsx src/db/migrate.ts"

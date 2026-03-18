@@ -101,7 +101,7 @@ export default function DashboardPage() {
                         <div className="page-hero-left">
                             <p className="page-hero-eyebrow">Enterprise Command Center</p>
                             <h1 className="page-hero-title">
-                                {user ? `Welcome back, ${user.firstName || user.username}` : 'Chairman Executive Overview'}
+                                {user ? `Welcome back, ${user.name?.split(' ')[0] || user.firstName || user.username}` : 'Chairman Executive Overview'}
                             </h1>
                             <p className="page-hero-subtitle">Live portfolio across {projectData.length} connected platform{projectData.length !== 1 ? 's' : ''}</p>
                         </div>

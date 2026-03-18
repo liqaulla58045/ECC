@@ -1,8 +1,16 @@
 import express from 'express';
 import cors from 'cors';
+import path from 'path';
+import { fileURLToPath } from 'url';
 import { config } from 'dotenv';
 import { runMigrations } from './db/index.js';
 import { errorHandler } from './middleware/errorHandler.js';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname  = path.dirname(__filename);
+// In production the compiled file is at backend/api/dist/index.js
+// frontend/dist is 3 levels up then into frontend/dist
+const FRONTEND_DIST = path.join(__dirname, '../../../frontend/dist');
 
 import authRouter          from './routes/auth.js';
 import usersRouter         from './routes/users.js';
@@ -35,6 +43,11 @@ app.use(cors({
 
 app.use(express.json());
 
+// ─── Serve frontend in production ──────────────
+if (process.env.NODE_ENV === 'production') {
+    app.use(express.static(FRONTEND_DIST));
+}
+
 // ─── Health check ──────────────────────────────
 app.get('/health', (_req, res) => {
     res.json({ status: 'ok', timestamp: new Date().toISOString() });
@@ -52,10 +65,16 @@ app.use('/api/analytics',     analyticsRouter);
 app.use('/api',               miscRouter);   // problem-statements, job-postings, assessments, chatbot-enquiries
 app.use('/',                  aiRouter);     // /claude, /openai
 
-// ─── 404 ───────────────────────────────────────
-app.use((_req, res) => {
-    res.status(404).json({ error: 'Route not found.' });
-});
+// ─── SPA fallback (must be after all API routes) ─
+if (process.env.NODE_ENV === 'production') {
+    app.get('*', (_req, res) => {
+        res.sendFile(path.join(FRONTEND_DIST, 'index.html'));
+    });
+} else {
+    app.use((_req, res) => {
+        res.status(404).json({ error: 'Route not found.' });
+    });
+}
 
 // ─── Error handler ─────────────────────────────
 app.use(errorHandler);
