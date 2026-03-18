@@ -7,11 +7,11 @@ import { config } from 'dotenv';
 import { runMigrations } from './db/index.js';
 import { errorHandler } from './middleware/errorHandler.js';
 
-// Resolve frontend/dist relative to this compiled file (backend/api/dist/index.js)
-// __dirname = .../backend/api/dist  →  ../../../frontend/dist = repo root/frontend/dist
+// frontend build is copied into backend/api/dist/public during the Render build step
+// so the path is always __dirname/public regardless of CWD
 const __filename = fileURLToPath(import.meta.url);
 const __dirname  = path.dirname(__filename);
-const FRONTEND_DIST = path.join(__dirname, '..', '..', '..', 'frontend', 'dist');
+const FRONTEND_DIST = path.join(__dirname, 'public');
 
 import authRouter          from './routes/auth.js';
 import usersRouter         from './routes/users.js';
