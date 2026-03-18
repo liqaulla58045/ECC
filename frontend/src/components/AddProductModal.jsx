@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
-import { X, Check, Loader } from 'lucide-react';
+import { X, Check, Loader, RefreshCw, Sparkles } from 'lucide-react';
 import { api } from '../utils/api';
 import '../styles/AddProductModal.css';
 
@@ -18,6 +18,7 @@ export default function AddProductModal({ onClose, onAddProject }) {
     const [done, setDone] = useState(false);
     const [projectId, setProjectId] = useState(null);
     const [saveError, setSaveError] = useState('');
+    const [generatingDesc, setGeneratingDesc] = useState(false);
 
     const set = (k, v) => {
         setForm(f => ({ ...f, [k]: v }));
@@ -26,10 +27,27 @@ export default function AddProductModal({ onClose, onAddProject }) {
 
     const validate = () => {
         const e = {};
-        if (!form.name.trim())        e.name = 'Required';
-        if (!form.mcpUrl.trim())      e.mcpUrl = 'Required';
-        if (!form.description.trim()) e.description = 'Required';
+        if (!form.name.trim())   e.name   = 'Required';
+        if (!form.mcpUrl.trim()) e.mcpUrl = 'Required';
         return e;
+    };
+
+    const generateDescription = async (url) => {
+        const trimmed = url?.trim().replace(/\/+$/, '');
+        if (!trimmed) return;
+        setGeneratingDesc(true);
+        try {
+            const res = await api('/api/projects/describe', {
+                method: 'POST',
+                body: JSON.stringify({ url: trimmed }),
+            });
+            const data = await res.json();
+            if (data.description) set('description', data.description);
+        } catch {
+            // silently fail — user can type manually
+        } finally {
+            setGeneratingDesc(false);
+        }
     };
 
     const submit = async (e) => {
@@ -148,7 +166,8 @@ export default function AddProductModal({ onClose, onAddProject }) {
                             <Field label="Platform URL" required error={errors.mcpUrl}>
                                 <input className={`apm-input ${errors.mcpUrl ? 'apm-input--err' : ''}`}
                                     placeholder="https://yourplatform.com" value={form.mcpUrl}
-                                    onChange={e => set('mcpUrl', e.target.value)} />
+                                    onChange={e => set('mcpUrl', e.target.value)}
+                                    onBlur={e => generateDescription(e.target.value)} />
                             </Field>
 
                             <Field label="Stats API Path">
@@ -171,13 +190,29 @@ export default function AddProductModal({ onClose, onAddProject }) {
                                 </Field>
                             </div>
 
-                            <Field label="Short Description" required error={errors.description}>
-                                <textarea
-                                    className={`apm-input apm-textarea ${errors.description ? 'apm-input--err' : ''}`}
-                                    placeholder="Brief description of the project…"
-                                    rows={3} value={form.description}
-                                    onChange={e => set('description', e.target.value)}
-                                />
+                            <Field label="Short Description">
+                                <div style={{ position: 'relative' }}>
+                                    <textarea
+                                        className="apm-input apm-textarea"
+                                        placeholder={generatingDesc ? 'Generating from URL…' : 'Enter a URL above to auto-generate…'}
+                                        rows={3} value={form.description}
+                                        onChange={e => set('description', e.target.value)}
+                                        disabled={generatingDesc}
+                                    />
+                                    <div style={{ position: 'absolute', top: 8, right: 8, display: 'flex', gap: 4, alignItems: 'center' }}>
+                                        {generatingDesc
+                                            ? <Loader size={13} className="apm-spin" style={{ color: 'var(--c-accent)' }} />
+                                            : form.description
+                                                ? <><Sparkles size={12} style={{ color: 'var(--c-accent)', opacity: 0.7 }} />
+                                                    <button type="button" title="Regenerate"
+                                                        style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, color: 'var(--c-accent)', opacity: 0.7 }}
+                                                        onClick={() => generateDescription(form.mcpUrl)}>
+                                                        <RefreshCw size={12} />
+                                                    </button></>
+                                                : null
+                                        }
+                                    </div>
+                                </div>
                             </Field>
 
                             <div className="apm-row">

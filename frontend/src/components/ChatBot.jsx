@@ -82,8 +82,9 @@ async function askClaude(messageHistory, userText, systemContext) {
         }
         const data = await res.json();
         return { type: 'text', text: data.content[0].text };
-    } catch {
-        return { type: 'text', text: '⚠️ Could not reach the assistant. Make sure the backend is running.' };
+    } catch (e) {
+        console.error('askClaude error:', e);
+        return { type: 'text', text: `⚠️ Could not reach the assistant: ${e.message}` };
     }
 }
 
@@ -100,8 +101,9 @@ async function askOpenAI(userText) {
         }
         const data = await res.json();
         return { type: 'chart', chartData: data.chartData };
-    } catch {
-        return { type: 'text', text: '⚠️ Could not generate chart. Make sure the backend is running.' };
+    } catch (e) {
+        console.error('askOpenAI error:', e);
+        return { type: 'text', text: `⚠️ Could not generate chart: ${e.message}` };
     }
 }
 
@@ -410,7 +412,8 @@ export default function ChatBot() {
     const handleFileChange = async (e) => {
         const file = e.target.files?.[0];
         if (!file) return;
-        if (file.size > 50 * 1024) { setNotif('File too large (max 50 KB)'); return; }
+        const MAX = 5 * 1024 * 1024; // 5 MB limit
+        if (file.size > MAX) { setNotif('File too large (max 5 MB)'); return; }
         try {
             const content = await readFileAsText(file);
             setAttachedFile({ name: file.name, content });
@@ -556,7 +559,6 @@ Be concise, professional, and data-focused. Use ** for bold key terms.`;
                             </div>
                         </div>
                         <input type="file" ref={fileRef} style={{ display: 'none' }}
-                            accept=".txt,.csv,.json,.md,.js,.ts,.py,.html,.css,.xml,.log"
                             onChange={handleFileChange} />
                         {notif && <div className="cb-notif cb-anim-fade-up">{notif}</div>}
                         <div className="cb-category-chips">
@@ -667,7 +669,6 @@ Be concise, professional, and data-focused. Use ** for bold key terms.`;
                             </div>
                         </div>
                         <input type="file" ref={fileRef} style={{ display: 'none' }}
-                            accept=".txt,.csv,.json,.md,.js,.ts,.py,.html,.css,.xml,.log"
                             onChange={handleFileChange} />
                         {notif && <div className="cb-notif cb-anim-fade-up">{notif}</div>}
                     </div>
