@@ -4,5 +4,11 @@
     "name": "CRM",
     "mcpUrl": "https://crm.rooman.com",
     "email": "admin"
+  },
+  {
+    "id": "proj-1773827601961",
+    "name": "SV",
+    "mcpUrl": "https://www.startupvarsity.com",
+    "email": "admin@startupvarsity.com"
   }
 ]
