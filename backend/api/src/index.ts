@@ -1,12 +1,17 @@
 import express from 'express';
 import cors from 'cors';
 import path from 'path';
+import { fileURLToPath } from 'url';
+import fs from 'fs';
 import { config } from 'dotenv';
 import { runMigrations } from './db/index.js';
 import { errorHandler } from './middleware/errorHandler.js';
 
-// process.cwd() = repo root when Render runs: node backend/api/dist/index.js
-const FRONTEND_DIST = path.join(process.cwd(), 'frontend', 'dist');
+// Resolve frontend/dist relative to this compiled file (backend/api/dist/index.js)
+// __dirname = .../backend/api/dist  →  ../../../frontend/dist = repo root/frontend/dist
+const __filename = fileURLToPath(import.meta.url);
+const __dirname  = path.dirname(__filename);
+const FRONTEND_DIST = path.join(__dirname, '..', '..', '..', 'frontend', 'dist');
 
 import authRouter          from './routes/auth.js';
 import usersRouter         from './routes/users.js';
@@ -41,6 +46,8 @@ app.use(express.json());
 
 // ─── Serve frontend in production ──────────────
 if (process.env.NODE_ENV === 'production') {
+    const distExists = fs.existsSync(FRONTEND_DIST);
+    console.log(`📦 Frontend dist: ${FRONTEND_DIST} (exists: ${distExists})`);
     app.use(express.static(FRONTEND_DIST));
 }
 
@@ -64,7 +71,9 @@ app.use('/',                  aiRouter);     // /claude, /openai
 // ─── SPA fallback (must be after all API routes) ─
 if (process.env.NODE_ENV === 'production') {
     app.get('*', (_req, res) => {
-        res.sendFile(path.join(FRONTEND_DIST, 'index.html'));
+        res.sendFile(path.join(FRONTEND_DIST, 'index.html'), (err) => {
+            if (err) res.status(500).json({ error: 'Frontend not built', dist: FRONTEND_DIST });
+        });
     });
 } else {
     app.use((_req, res) => {
