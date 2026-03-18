@@ -11,6 +11,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname  = path.dirname(__filename);
 const FRONTEND_DIST_CANDIDATES = [
     path.join(__dirname, 'public'),
+    path.resolve(__dirname, '..', '..', '..', 'frontend', 'dist'),
     path.resolve(process.cwd(), 'frontend', 'dist'),
 ];
 const FRONTEND_DIST = FRONTEND_DIST_CANDIDATES.find((p) => fs.existsSync(p)) || FRONTEND_DIST_CANDIDATES[0];
@@ -57,6 +58,12 @@ if (process.env.NODE_ENV === 'production') {
     console.log(`📦 Frontend dist candidates: ${FRONTEND_DIST_CANDIDATES.join(' | ')}`);
     console.log(`📦 Using frontend dist: ${FRONTEND_DIST} (exists: ${distExists})`);
     if (distExists) {
+        // Serve hashed Vite bundles with strict 404 behavior and long caching.
+        app.use('/assets', express.static(path.join(FRONTEND_DIST, 'assets'), {
+            fallthrough: false,
+            immutable: true,
+            maxAge: '1y',
+        }));
         app.use(express.static(FRONTEND_DIST));
     }
 }
