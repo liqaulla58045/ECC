@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(powershell -Command \"Restart-Service postgresql-x64-18 -Force; Start-Sleep -Seconds 3; \\(Get-Service postgresql-x64-18\\).Status\")",
+      "Bash(\"/c/Program Files/PostgreSQL/18/bin/pg_ctl.exe\" reload -D \"/c/Program Files/PostgreSQL/18/data\")",
+      "Bash(PGPASSWORD='Rooman1234$' \"/c/Program Files/PostgreSQL/18/bin/psql.exe\" -U postgres -p 5433 -d ecc_db -c \"SELECT 1;\")"
+    ],
+    "additionalDirectories": [
+      "C:\\Program Files\\PostgreSQL\\18\\data"
+    ]
+  }
+}
