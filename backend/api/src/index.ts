@@ -36,13 +36,18 @@ const allowedOrigins = (process.env.ALLOWED_ORIGINS || 'http://localhost:5173')
     .split(',')
     .map((o) => o.trim());
 
-app.use(cors({
+const corsMiddleware = cors({
     origin: (origin, cb) => {
         if (!origin || allowedOrigins.includes(origin)) return cb(null, true);
-        cb(new Error(`CORS policy blocked: ${origin}`));
+        const err: any = new Error(`CORS policy blocked: ${origin}`);
+        err.status = 403;
+        cb(err);
     },
     credentials: true,
-}));
+});
+
+// Apply CORS only to API-style routes. Static frontend assets should not go through CORS checks.
+app.use(['/api', '/claude', '/openai'], corsMiddleware);
 
 app.use(express.json());
 
