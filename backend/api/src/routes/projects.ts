@@ -55,6 +55,60 @@ router.get('/:id/monthly-metrics', async (req: AuthRequest, res: Response): Prom
     res.json(rows);
 });
 
+// POST /api/projects/describe — auto-generate description from a URL using Claude
+router.post('/describe', async (req: AuthRequest, res: Response): Promise<void> => {
+    const { url } = req.body;
+    if (!url) { res.status(400).json({ error: 'url is required.' }); return; }
+
+    let pageInfo = '';
+    try {
+        const pageRes = await fetch(url, {
+            signal: AbortSignal.timeout(8000),
+            headers: { 'User-Agent': 'Mozilla/5.0 (compatible; ECC-Bot/1.0)' },
+        });
+        const html = await pageRes.text();
+        const titleMatch = html.match(/<title[^>]*>([^<]+)<\/title>/i);
+        const title = titleMatch ? titleMatch[1].trim() : '';
+        const metaMatch =
+            html.match(/<meta[^>]+name=["']description["'][^>]+content=["']([^"']+)["']/i) ||
+            html.match(/<meta[^>]+content=["']([^"']+)["'][^>]+name=["']description["']/i);
+        const metaDesc = metaMatch ? metaMatch[1].trim() : '';
+        pageInfo = [title, metaDesc].filter(Boolean).join(' — ');
+    } catch {
+        pageInfo = '';
+    }
+
+    const apiKey = process.env.ANTHROPIC_API_KEY;
+    if (!apiKey) {
+        res.json({ description: pageInfo || `Platform at ${url}` });
+        return;
+    }
+
+    try {
+        const response = await fetch('https://api.anthropic.com/v1/messages', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'x-api-key': apiKey,
+                'anthropic-version': '2023-06-01',
+            },
+            body: JSON.stringify({
+                model: 'claude-haiku-4-5-20251001',
+                max_tokens: 80,
+                messages: [{
+                    role: 'user',
+                    content: `Write one concise sentence (max 20 words) describing this platform for an enterprise dashboard. URL: ${url}${pageInfo ? '. Page info: ' + pageInfo : ''}. Return only the description text, no quotes.`,
+                }],
+            }),
+        });
+        const data = await response.json();
+        const description = data.content?.[0]?.text?.trim() || pageInfo || `Platform at ${url}`;
+        res.json({ description });
+    } catch {
+        res.json({ description: pageInfo || `Platform at ${url}` });
+    }
+});
+
 // POST /api/projects — chairman/admin only
 router.post('/', requireRole('chairman', 'admin'), async (req: AuthRequest, res: Response): Promise<void> => {
     const { id, name, category, mcpUrl, statsPath, status, description, liveUrl, gitRepo, email, progress, startDate, endDate } = req.body;

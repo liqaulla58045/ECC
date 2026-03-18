@@ -244,7 +244,7 @@ INSERT INTO users (username, email, password_hash, role, first_name, last_name, 
 VALUES (
     'chairman',
     'chairman@ecc.com',
-    '$2a$12$ZG9YBmwLreYj/tNJSuMM3O6zAaD0UKh1xNj8gERwjqlbWbXQf0k2e',
+    '$2a$12$Wp3qAmqgJgutYiQSwYPSbukA1z4ScOivv/7U30JHvYCbulmivpm/K',
     'chairman',
     'Rajesh',
     'Kumar',
