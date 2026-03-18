@@ -54,21 +54,8 @@ function saveProjects(projects: any[]) {
 async function initBrowser() {
     browser = await chromium.launch({ headless: true });
 
-    const projects = loadProjects();
-
-    // Add default SV to map if no projects and .env exists
-    if (projects.length === 0 && SV_EMAIL && SV_PASSWORD) {
-        projects.push({
-            id: 'default-sv',
-            name: 'StartupVarsity Default',
-            mcpUrl: BASE_URL,
-            email: SV_EMAIL,
-            password: SV_PASSWORD,
-            status: 'Active',
-            description: 'Default project configured via .env'
-        });
-        saveProjects(projects);
-    }
+    // Only spin up sessions for projects that were explicitly registered — no defaults
+    const projects = loadProjects().filter((p: any) => p.id !== 'default-sv');
 
     await Promise.allSettled(
         projects.map((proj: any) => spinUpSession(proj.id, proj.mcpUrl, proj.email, proj.password))
@@ -77,6 +64,9 @@ async function initBrowser() {
 
 async function spinUpSession(id: string, baseUrl: string, email: string, password?: string) {
     if (!browser) throw new Error("Browser not init");
+
+    // Normalize: strip trailing slash so /login paths are clean
+    baseUrl = baseUrl.replace(/\/+$/, '');
 
     if (sessions.has(id)) {
         try { await sessions.get(id)?.context.close(); } catch { }
@@ -97,23 +87,69 @@ async function performLogin(id: string, email: string, password: string): Promis
     if (!session) throw new Error(`Session ${id} not initialized`);
 
     const { page, baseUrl } = session;
-    await page.goto(`${baseUrl}/login`, { waitUntil: "networkidle" });
 
-    await page.fill('input[type="email"], input[name="email"]', email);
-    await page.fill('input[type="password"], input[name="password"]', password);
-    await page.click('button[type="submit"]');
+    // Navigate — try domcontentloaded first (faster), fallback to plain load
+    try {
+        await page.goto(`${baseUrl}/login`, { waitUntil: "domcontentloaded", timeout: 12000 });
+    } catch {
+        await page.goto(`${baseUrl}/login`, { timeout: 12000 });
+    }
+
+    // Try multiple common email/username selectors
+    const emailSelectors = [
+        'input[type="email"]',
+        'input[name="email"]',
+        'input[name="username"]',
+        'input[id="email"]',
+        'input[id="username"]',
+        'input[placeholder*="mail" i]',
+        'input[placeholder*="user" i]',
+        'input[placeholder*="phone" i]',
+        'input[type="text"]',
+    ];
+
+    let emailFilled = false;
+    for (const sel of emailSelectors) {
+        try {
+            await page.fill(sel, email, { timeout: 2500 });
+            emailFilled = true;
+            console.error(`✅ Found email field: ${sel}`);
+            break;
+        } catch { /* try next selector */ }
+    }
+
+    if (!emailFilled) {
+        throw new Error(
+            `Login form not found at ${baseUrl}/login. ` +
+            `The platform may use a different login URL or form structure.`
+        );
+    }
+
+    // Fill password
+    try {
+        await page.fill('input[type="password"]', password, { timeout: 5000 });
+    } catch {
+        throw new Error(`Password field not found at ${baseUrl}/login.`);
+    }
+
+    // Submit — try button click, fall back to Enter
+    try {
+        await page.click('button[type="submit"]', { timeout: 4000 });
+    } catch {
+        await page.keyboard.press('Enter');
+    }
 
     try {
-        await page.waitForNavigation({ waitUntil: "networkidle", timeout: 10000 });
+        await page.waitForNavigation({ waitUntil: "networkidle", timeout: 8000 });
     } catch { }
 
     const currentUrl = page.url();
     if (currentUrl.includes("/login")) {
-        console.error(`❌ Login failed for ${id}`);
+        console.error(`❌ Login failed for ${id} — still on login page`);
         return false;
     }
 
-    await page.waitForTimeout(2000);
+    await page.waitForTimeout(1500);
     session.isLoggedIn = true;
     console.error(`✅ Logged into ${id}.`);
     return true;
@@ -131,12 +167,44 @@ async function apiGet(path: string, projectId?: string): Promise<unknown> {
 
     const result = await session.page.evaluate(
         async (url: string) => {
+            // Extract JWT from common localStorage / sessionStorage keys
+            const token =
+                localStorage.getItem('token') ||
+                localStorage.getItem('access_token') ||
+                localStorage.getItem('accessToken') ||
+                localStorage.getItem('jwt') ||
+                localStorage.getItem('auth_token') ||
+                localStorage.getItem('authToken') ||
+                localStorage.getItem('userToken') ||
+                sessionStorage.getItem('token') ||
+                sessionStorage.getItem('access_token') ||
+                sessionStorage.getItem('accessToken') ||
+                null;
+
+            // Also check for token inside a JSON object (e.g. { access: "...", refresh: "..." })
+            let bearerToken = token;
+            if (!bearerToken) {
+                for (const key of ['user', 'auth', 'session', 'userData']) {
+                    try {
+                        const raw = localStorage.getItem(key) || sessionStorage.getItem(key);
+                        if (raw) {
+                            const parsed = JSON.parse(raw);
+                            bearerToken = parsed?.access || parsed?.token || parsed?.accessToken || parsed?.jwt || null;
+                            if (bearerToken) break;
+                        }
+                    } catch { /* skip */ }
+                }
+            }
+
+            const headers: Record<string, string> = {
+                "Content-Type": "application/json",
+                Accept: "application/json",
+            };
+            if (bearerToken) headers['Authorization'] = `Bearer ${bearerToken}`;
+
             const res = await fetch(url, {
                 method: "GET",
-                headers: {
-                    "Content-Type": "application/json",
-                    Accept: "application/json",
-                },
+                headers,
                 credentials: "include",
             });
 
@@ -144,7 +212,7 @@ async function apiGet(path: string, projectId?: string): Promise<unknown> {
             let data: unknown;
             try { data = JSON.parse(text); } catch { data = text; }
 
-            return { ok: res.ok, status: res.status, data };
+            return { ok: res.ok, status: res.status, data, usedToken: !!bearerToken };
         },
         `${session.baseUrl}${path}`
     );
@@ -565,21 +633,41 @@ app.get('/api/projects', (req, res) => {
 });
 
 app.post('/api/projects', async (req, res) => {
-    try {
-        const { id: providedId, name, mcpUrl, status, email, password, description, liveUrl, gitRepo } = req.body;
-        const id = providedId || `proj-${Date.now()}`;
+    const { id: providedId, name, mcpUrl, status, email, password, description, liveUrl, gitRepo } = req.body;
+    const id = providedId || `proj-${Date.now()}`;
 
+    let loginWarning: string | null = null;
+    try {
         await spinUpSession(id, mcpUrl, email, password);
-        const projects = loadProjects();
+    } catch (loginErr: any) {
+        loginWarning = loginErr.message;
+        console.error(`⚠️ Login failed for ${id}: ${loginErr.message}`);
+    }
+
+    // Always register the project (even if login failed)
+    const projects = loadProjects();
+    if (!projects.find((p: any) => p.id === id)) {
         const newProj = { id, name, mcpUrl, email, status, description, liveUrl, gitRepo };
         projects.push(newProj);
         saveProjects(projects);
-
-        res.json({ success: true, project: newProj });
-    } catch (err: any) {
-        console.error(err);
-        res.status(500).json({ error: err.message });
     }
+
+    res.json({ success: true, project: { id, name, mcpUrl }, loginWarning });
+});
+
+app.delete('/api/projects/:id', (req, res) => {
+    const { id } = req.params;
+    const projects = loadProjects().filter((p: any) => p.id !== id);
+    saveProjects(projects);
+
+    // Close and remove the browser session if it exists
+    const session = sessions.get(id);
+    if (session) {
+        session.context.close().catch(() => {});
+        sessions.delete(id);
+    }
+
+    res.json({ success: true });
 });
 
 // ─────────────────────────────────────────────

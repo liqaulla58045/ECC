@@ -90,18 +90,34 @@ export default function DashboardPage() {
         setIsAddProductOpen(false);
     };
 
+    const activeCount = projectData.filter(p => p.status?.toLowerCase() === 'active').length;
+
     return (
         <>
-            <h1 className="db-page-title">
-                {user ? `${user.firstName || user.username}'s Executive Overview` : 'Chairman Executive Overview'}
-            </h1>
-
-            <div className="db-projects-bar">
-                <h2>Running Projects ({filteredProjects.length} Active)</h2>
-                <button className="db-add-btn" onClick={() => setIsAddProductOpen(true)}>
-                    <Plus size={16} strokeWidth={2.5} />
-                    ADD PRODUCT
-                </button>
+            <div className="page-hero">
+                <div className="page-hero-mesh" />
+                <div className="page-hero-content">
+                    <div className="page-hero-row">
+                        <div className="page-hero-left">
+                            <p className="page-hero-eyebrow">Enterprise Command Center</p>
+                            <h1 className="page-hero-title">
+                                {user ? `Welcome back, ${user.firstName || user.username}` : 'Chairman Executive Overview'}
+                            </h1>
+                            <p className="page-hero-subtitle">Live portfolio across {projectData.length} connected platform{projectData.length !== 1 ? 's' : ''}</p>
+                        </div>
+                        <div className="page-hero-right">
+                            <button className="db-add-btn" onClick={() => setIsAddProductOpen(true)}>
+                                <Plus size={16} strokeWidth={2.5} />
+                                ADD PROJECT
+                            </button>
+                        </div>
+                    </div>
+                    <div className="page-hero-chips">
+                        <span className="page-hero-chip"><strong>{projectData.length}</strong>&nbsp;Projects</span>
+                        <span className="page-hero-chip"><strong>{activeCount}</strong>&nbsp;Active</span>
+                        <span className="page-hero-chip"><strong>{filteredProjects.length}</strong>&nbsp;Displayed</span>
+                    </div>
+                </div>
             </div>
 
             <div className="db-cards-grid">

@@ -3,6 +3,7 @@
     min-height: 100%;
     background: var(--c-bg, #F8F9FA);
 }
+.rp-root .page-hero { margin: -28px -32px 28px; }
 
 /* ─── HEADER ─── */
 .rp-header {

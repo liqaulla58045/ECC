@@ -3,7 +3,8 @@
     "allow": [
       "Bash(sc query:*)",
       "Bash(powershell -Command \"Get-Service | Where-Object {$_ame -like ''''*postgresql*'''' -or $_ame -like ''''*postgres*''''} | Select-Object Name, Status\")",
-      "Bash(powershell -Command \"Start-Service postgresql-x64-18; \\(Get-Service postgresql-x64-18\\).Status\")"
+      "Bash(powershell -Command \"Start-Service postgresql-x64-18; \\(Get-Service postgresql-x64-18\\).Status\")",
+      "Bash(psql -U postgres -p 5433 -d ecc_db -c \"ALTER TABLE metrics_snapshots ADD COLUMN IF NOT EXISTS raw_data JSONB;\")"
     ]
   }
 }
