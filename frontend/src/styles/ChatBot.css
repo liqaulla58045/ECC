@@ -4,7 +4,7 @@
    ══════════════════════════════════════════════ */
 
 :root {
-    --cb-bg-gradient: radial-gradient(circle at center, rgba(217, 119, 6, 0.03) 0%, transparent 70%);
+    --cb-bg-gradient: radial-gradient(circle at center, rgba(99,102,241,0.05) 0%, transparent 70%);
 }
 
 .cb-root {
@@ -19,7 +19,6 @@
 }
 
 .cb-root--landing {
-    background: var(--cb-bg-gradient);
     justify-content: center;
     align-items: center;
 }
@@ -37,16 +36,50 @@
     padding: 40px 20px;
 }
 
+/* Dark premium hero for landing */
+.cb-landing-hero {
+    position: relative;
+    text-align: center;
+    margin-bottom: 40px;
+    width: 100%;
+    padding: 48px 40px 44px;
+    border-radius: 24px;
+    background: linear-gradient(135deg, #1e1b4b 0%, #2d2b6b 55%, #1a3a5c 100%);
+    border: 1px solid rgba(255,255,255,0.1);
+    overflow: hidden;
+    box-shadow: 0 16px 48px rgba(30,27,75,0.3);
+}
+.cb-landing-hero::before {
+    content: '';
+    position: absolute; width: 400px; height: 400px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(129,140,248,0.25) 0%, transparent 70%);
+    top: -120px; left: -80px; pointer-events: none;
+    animation: dbOrbFloat 12s ease-in-out infinite alternate;
+}
+.cb-landing-hero::after {
+    content: '';
+    position: absolute; width: 300px; height: 300px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(52,211,153,0.14) 0%, transparent 70%);
+    bottom: -80px; right: -40px; pointer-events: none;
+    animation: dbOrbFloat 9s ease-in-out infinite alternate-reverse;
+}
+.cb-landing-hero-mesh {
+    position: absolute; inset: 0; z-index: 0; pointer-events: none; border-radius: 24px;
+    background-image:
+        linear-gradient(rgba(255,255,255,0.015) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.015) 1px, transparent 1px);
+    background-size: 48px 48px;
+}
+.cb-landing-hero-inner { position: relative; z-index: 2; }
+
 .cb-hero-icon-wrap {
-    width: 64px;
-    height: 64px;
-    border-radius: 18px;
-    background: var(--c-accent-bg);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--c-accent);
-    margin: 0 auto 20px;
+    width: 72px; height: 72px;
+    border-radius: 20px;
+    background: rgba(99,102,241,0.2);
+    border: 1px solid rgba(99,102,241,0.4);
+    display: flex; align-items: center; justify-content: center;
+    color: #818CF8; margin: 0 auto 20px;
+    box-shadow: 0 8px 32px rgba(99,102,241,0.25);
 }
 
 .cb-hero-icon {
@@ -55,23 +88,27 @@
 
 @keyframes simple-pulse {
     0%, 100% { opacity: 0.8; transform: scale(1); }
-    50%       { opacity: 1;   transform: scale(1.05); }
+    50%       { opacity: 1;   transform: scale(1.08); }
 }
 
 .cb-landing-title {
     font-family: var(--font-display);
     font-size: 2.5rem;
-    font-weight: 800;
-    color: var(--c-text);
+    font-weight: 900;
+    letter-spacing: -0.04em;
+    background: linear-gradient(135deg, #ffffff 0%, rgba(200,210,255,0.85) 100%);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    background-clip: text;
     margin: 0;
 }
 
 .cb-landing-subtitle {
-    font-size: 1.15rem;
-    color: var(--c-text-2);
+    font-size: 1rem;
+    color: rgba(255,255,255,0.45);
     margin: 12px auto 0;
     max-width: 500px;
 }
+.cb-landing-subtitle strong { color: rgba(200,210,255,0.85); }
 
 /* ─── LANDING INPUT ─── */
 .cb-landing-input-wrap {
@@ -81,11 +118,6 @@
     gap: 16px;
     margin-bottom: 40px;
     position: relative;
-}
-
-.cb-landing-hero {
-    text-align: center;
-    margin-bottom: 40px;
 }
 
 .cb-landing-input-box {
@@ -281,9 +313,13 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 16px 0;
-    border-bottom: 1px solid var(--c-border);
+    padding: 14px 20px;
+    border-radius: 16px;
+    background: linear-gradient(135deg, #1e1b4b 0%, #2d2b6b 100%);
+    border: 1px solid rgba(255,255,255,0.1);
     flex-shrink: 0;
+    margin-bottom: 12px;
+    box-shadow: 0 6px 24px rgba(30,27,75,0.2);
 }
 
 .cb-active-title-wrap {
@@ -292,12 +328,12 @@
     gap: 8px;
 }
 
-.cb-bot-icon { color: var(--c-accent); }
+.cb-bot-icon { color: #818CF8; }
 
 .cb-active-title {
     font-family: var(--font-display);
     font-weight: 700;
-    color: var(--c-text);
+    color: rgba(255,255,255,0.9);
     margin: 0;
 }
 

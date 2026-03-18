@@ -143,6 +143,14 @@ export default function SettingsPage() {
 
     return (
         <div className="settings-root anim-fade-in">
+            <div className="page-hero">
+                <div className="page-hero-mesh" />
+                <div className="page-hero-content">
+                    <p className="page-hero-eyebrow">Preferences & Configuration</p>
+                    <h1 className="page-hero-title">Settings</h1>
+                    <p className="page-hero-subtitle">Manage your profile, security, appearance, and notifications</p>
+                </div>
+            </div>
             <div className="settings-container">
 
                 <aside className="settings-nav">

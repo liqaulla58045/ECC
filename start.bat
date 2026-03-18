@@ -37,9 +37,10 @@ timeout /t 2 /nobreak >nul
 
 :: ── Start MCP Server
 echo  [3/4] Starting MCP Server on http://localhost:3002 ...
-start "ECC MCP Server" cmd /k "cd /d %~dp0backend\mcp-server && echo  MCP Server starting... && npx tsx server.ts"
+start "ECC MCP Server" cmd /k "cd /d %~dp0backend\mcp-server && npm install --silent && npx playwright install chromium && echo  MCP Server starting... && npx tsx server.ts"
 
-timeout /t 2 /nobreak >nul
+echo  Waiting for MCP Server to boot (Playwright takes ~10s)...
+timeout /t 10 /nobreak >nul
 
 :: ── Start Frontend
 echo  [4/4] Starting Frontend on http://localhost:5173 ...

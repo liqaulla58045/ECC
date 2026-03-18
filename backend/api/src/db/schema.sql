@@ -41,6 +41,7 @@ CREATE TABLE IF NOT EXISTS projects (
     git_repo          VARCHAR(500),
     email             VARCHAR(255),
     password_encrypted TEXT,
+    stats_path        VARCHAR(500) NOT NULL DEFAULT '/api/admin/stats',
     progress          SMALLINT NOT NULL DEFAULT 0 CHECK (progress BETWEEN 0 AND 100),
     start_date        VARCHAR(50),
     end_date          VARCHAR(50),
@@ -211,6 +212,12 @@ CREATE TABLE IF NOT EXISTS chatbot_enquiries (
     response   TEXT,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
+
+-- ─────────────────────────────────────────────
+-- MIGRATIONS (safe for existing databases)
+-- ─────────────────────────────────────────────
+ALTER TABLE projects ADD COLUMN IF NOT EXISTS stats_path VARCHAR(500) NOT NULL DEFAULT '/api/admin/stats';
+ALTER TABLE metrics_snapshots ADD COLUMN IF NOT EXISTS raw_data JSONB;
 
 -- ─────────────────────────────────────────────
 -- INDEXES (for common query patterns)

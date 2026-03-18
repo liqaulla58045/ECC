@@ -2,7 +2,7 @@ import { Router, Response } from 'express';
 import { db } from '../db/index.js';
 import { authenticate, requireRole } from '../middleware/auth.js';
 import { AuthRequest } from '../types/index.js';
-import { registerProjectWithMcp, fetchMcpStats } from '../services/mcpConnector.js';
+import { registerProjectWithMcp, fetchMcpStats, removeProjectFromMcp } from '../services/mcpConnector.js';
 
 const router = Router();
 router.use(authenticate);
@@ -10,7 +10,7 @@ router.use(authenticate);
 // GET /api/projects
 router.get('/', async (_req: AuthRequest, res: Response): Promise<void> => {
     const { rows } = await db.query(
-        `SELECT id, name, category, mcp_url, status, description,
+        `SELECT id, name, category, mcp_url, stats_path, status, description,
                 live_url, git_repo, email, progress, start_date, end_date, created_at
          FROM projects
          ORDER BY created_at DESC`
@@ -21,7 +21,7 @@ router.get('/', async (_req: AuthRequest, res: Response): Promise<void> => {
 // GET /api/projects/:id
 router.get('/:id', async (req: AuthRequest, res: Response): Promise<void> => {
     const { rows } = await db.query(
-        `SELECT id, name, category, mcp_url, status, description,
+        `SELECT id, name, category, mcp_url, stats_path, status, description,
                 live_url, git_repo, email, progress, start_date, end_date, created_at
          FROM projects WHERE id = $1`,
         [req.params.id]
@@ -57,7 +57,7 @@ router.get('/:id/monthly-metrics', async (req: AuthRequest, res: Response): Prom
 
 // POST /api/projects — chairman/admin only
 router.post('/', requireRole('chairman', 'admin'), async (req: AuthRequest, res: Response): Promise<void> => {
-    const { id, name, category, mcpUrl, status, description, liveUrl, gitRepo, email, progress, startDate, endDate } = req.body;
+    const { id, name, category, mcpUrl, statsPath, status, description, liveUrl, gitRepo, email, progress, startDate, endDate } = req.body;
 
     if (!id || !name) {
         res.status(400).json({ error: 'id and name are required.' });
@@ -65,11 +65,12 @@ router.post('/', requireRole('chairman', 'admin'), async (req: AuthRequest, res:
     }
 
     const { rows } = await db.query(
-        `INSERT INTO projects (id, name, category, mcp_url, status, description, live_url, git_repo, email, progress, start_date, end_date)
-         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12)
-         RETURNING id, name, category, mcp_url, status, description, live_url, git_repo, email, progress, start_date, end_date, created_at`,
-        [id, name, category || 'Platform', mcpUrl || null, status || 'Active', description || null,
-         liveUrl || null, gitRepo || null, email || null, progress ?? 0, startDate || null, endDate || null]
+        `INSERT INTO projects (id, name, category, mcp_url, stats_path, status, description, live_url, git_repo, email, progress, start_date, end_date)
+         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13)
+         RETURNING id, name, category, mcp_url, stats_path, status, description, live_url, git_repo, email, progress, start_date, end_date, created_at`,
+        [id, name, category || 'Platform', mcpUrl || null, statsPath || '/api/admin/stats',
+         status || 'Active', description || null, liveUrl || null, gitRepo || null,
+         email || null, progress ?? 0, startDate || null, endDate || null]
     );
     res.status(201).json(rows[0]);
 });
@@ -105,6 +106,8 @@ router.patch('/:id', requireRole('chairman', 'admin'), async (req: AuthRequest, 
 router.delete('/:id', requireRole('chairman'), async (req: AuthRequest, res: Response): Promise<void> => {
     const { rowCount } = await db.query('DELETE FROM projects WHERE id = $1', [req.params.id]);
     if (!rowCount) { res.status(404).json({ error: 'Project not found.' }); return; }
+    // Also clean up MCP browser session and projects.json entry
+    await removeProjectFromMcp(req.params.id);
     res.json({ success: true });
 });
 
@@ -133,7 +136,7 @@ router.post('/:id/sync', requireRole('chairman', 'admin'), async (req: AuthReque
     const projectId = req.params.id;
 
     const { rows } = await db.query(
-        'SELECT id, name, mcp_url, email FROM projects WHERE id = $1',
+        'SELECT id, name, mcp_url, stats_path, email FROM projects WHERE id = $1',
         [projectId]
     );
     if (!rows[0]) { res.status(404).json({ error: 'Project not found.' }); return; }
@@ -141,6 +144,7 @@ router.post('/:id/sync', requireRole('chairman', 'admin'), async (req: AuthReque
     const project = rows[0];
     const mcpUrl = project.mcp_url;
     const loginEmail = email || project.email;
+    const statsPath = project.stats_path || '/api/admin/stats';
 
     if (!mcpUrl || !loginEmail || !password) {
         res.status(400).json({ error: 'mcp_url, email, and password are required to sync.' });
@@ -150,17 +154,38 @@ router.post('/:id/sync', requireRole('chairman', 'admin'), async (req: AuthReque
     try {
         // 1. Register project with MCP — triggers Playwright login
         await registerProjectWithMcp(projectId, mcpUrl, loginEmail, password, project.name);
+    } catch (loginErr: any) {
+        res.json({
+            success: false,
+            loginFailed: true,
+            warning: loginErr.message || 'Could not log in to platform. Check credentials and platform URL.',
+        });
+        return;
+    }
 
-        // 2. Fetch live stats from platform via MCP proxy
-        const raw = await fetchMcpStats(projectId);
+    let raw: Record<string, unknown>;
+    try {
+        // 2. Fetch live stats from platform via MCP proxy using project's configured path
+        raw = await fetchMcpStats(projectId, statsPath);
+    } catch (statsErr: any) {
+        res.json({
+            success: false,
+            loginFailed: false,
+            warning: `Connected but stats fetch failed: ${statsErr.message}. Try a different Stats API Path.`,
+        });
+        return;
+    }
+
+    try {
         const s = raw as any;
 
-        // 3. Save metrics snapshot
+        // 3. Save metrics snapshot — includes raw_data for dynamic card rendering
         const snap = await db.query(
             `INSERT INTO metrics_snapshots
                 (project_id, total_users, total_learners, total_teams, total_mentors,
-                 total_applications, active_cohorts, seed_deployed_lakhs, stipends_disbursed_lakhs)
-             VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9)
+                 total_applications, active_cohorts, seed_deployed_lakhs, stipends_disbursed_lakhs,
+                 raw_data)
+             VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)
              RETURNING *`,
             [
                 projectId,
@@ -172,6 +197,7 @@ router.post('/:id/sync', requireRole('chairman', 'admin'), async (req: AuthReque
                 s.activeCohorts      ?? s.active_cohorts      ?? 0,
                 s.seedDeployedLakhs  ?? s.seed_deployed_lakhs  ?? 0,
                 s.stipendsDisbursedLakhs ?? s.stipends_disbursed_lakhs ?? 0,
+                JSON.stringify(raw),
             ]
         );
 

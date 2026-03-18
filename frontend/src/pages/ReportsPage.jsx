@@ -145,18 +145,30 @@ export default function ReportsPage() {
 
     return (
         <div className="rp-root anim-fade-in">
-            <div className="rp-header">
-                <div>
-                    <h1 className="rp-title">Reports & Analytics</h1>
-                    <p className="rp-subtitle">{connectedCount} connected project{connectedCount !== 1 ? 's' : ''} · live data</p>
-                </div>
-                <div className="rp-header-actions">
-                    <button className={`rp-icon-btn ${refreshing ? 'spinning' : ''}`} onClick={handleRefresh} title="Refresh">
-                        <RefreshCw size={16} />
-                    </button>
-                    <button className="rp-export-btn" onClick={() => alert('Export coming soon.')}>
-                        <Download size={14} /> Export
-                    </button>
+            <div className="page-hero">
+                <div className="page-hero-mesh" />
+                <div className="page-hero-content">
+                    <div className="page-hero-row">
+                        <div className="page-hero-left">
+                            <p className="page-hero-eyebrow">Intelligence Hub</p>
+                            <h1 className="page-hero-title">Reports & Analytics</h1>
+                            <p className="page-hero-subtitle">{connectedCount} connected project{connectedCount !== 1 ? 's' : ''} · live data aggregation</p>
+                        </div>
+                        <div className="page-hero-right">
+                            <button className={`rp-icon-btn ${refreshing ? 'spinning' : ''}`} onClick={handleRefresh} title="Refresh" style={{ color: 'rgba(255,255,255,0.6)', border: '1px solid rgba(255,255,255,0.15)', background: 'rgba(255,255,255,0.08)' }}>
+                                <RefreshCw size={16} />
+                            </button>
+                            <button className="rp-export-btn" onClick={() => alert('Export coming soon.')}>
+                                <Download size={14} /> Export
+                            </button>
+                        </div>
+                    </div>
+                    <div className="page-hero-chips">
+                        <span className="page-hero-chip"><strong>{connectedCount}</strong>&nbsp;Projects</span>
+                        <span className="page-hero-chip"><strong>{(totals.totalLearners || 0).toLocaleString()}</strong>&nbsp;Learners</span>
+                        <span className="page-hero-chip"><strong>{totals.totalTeams || 0}</strong>&nbsp;Teams</span>
+                        <span className="page-hero-chip"><strong>{totals.activeCohorts || 0}</strong>&nbsp;Cohorts</span>
+                    </div>
                 </div>
             </div>
 
