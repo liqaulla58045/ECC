@@ -32,6 +32,9 @@ services:
         exit 1
       fi
 
+      echo "[ecc-api] Copying schema.sql into dist/db/..."
+      cp src/db/schema.sql dist/db/schema.sql
+
       echo "[ecc-api] Copying frontend dist into backend/api/dist/public..."
       mkdir -p dist/public
       rm -rf dist/public/*
