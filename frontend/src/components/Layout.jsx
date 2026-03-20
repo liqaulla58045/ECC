@@ -20,6 +20,7 @@ export default function Layout() {
     const navigate = useNavigate();
     const location = useLocation();
     const { user, logout } = useUser();
+    const logoUrl = `${import.meta.env.BASE_URL}rooman-logo.png`;
     const [isCollapsed, setIsCollapsed] = useState(false);
 
     // Search state
@@ -83,7 +84,7 @@ export default function Layout() {
                         <Sidebar size={20} />
                     </div>
                     <div className="db-sidebar-brand-group">
-                        <img src="/rooman-logo.png" className="db-sidebar-brand-logo" alt="Rooman" />
+                        <img src={logoUrl} className="db-sidebar-brand-logo" alt="Rooman" />
                     </div>
                 </div>
 

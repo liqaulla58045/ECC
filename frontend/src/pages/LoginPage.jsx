@@ -7,6 +7,7 @@ import '../styles/LoginPage.css';
 export default function LoginPage() {
     const navigate = useNavigate();
     const { login } = useUser();
+    const logoUrl = `${import.meta.env.BASE_URL}rooman-logo.png`;
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [showPw, setShowPw] = useState(false);
@@ -57,7 +58,7 @@ export default function LoginPage() {
         <div className="lp-root">
             <div className="lp-bg-wrapper">
                 <img
-                    src="/rooman-logo.png"
+                    src={logoUrl}
                     className="lp-bg-image lp-bg-logo"
                     alt="Rooman Background"
                 />
@@ -67,7 +68,7 @@ export default function LoginPage() {
             <div className="lp-centered-content">
                 <div className="lp-form-wrap anim-scale-in">
                     <div className="lp-brand anim-fade-up">
-                        <img src="/rooman-logo.png" className="lp-brand-logo" alt="Rooman Logo" />
+                        <img src={logoUrl} className="lp-brand-logo" alt="Rooman Logo" />
                         <span className="lp-brand-name">Enterprise Command Center</span>
                     </div>
 
