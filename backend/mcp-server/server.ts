@@ -18,13 +18,7 @@ import { fileURLToPath } from 'url';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 config({ path: path.resolve(__dirname, '../../.env') });
 
-const SV_EMAIL = process.env.SV_EMAIL;
-const SV_PASSWORD = process.env.SV_PASSWORD;
 const BASE_URL = "https://www.startupvarsity.com";
-
-if (!SV_EMAIL || !SV_PASSWORD) {
-    console.error("⚠️ Warning: Missing SV_EMAIL or SV_PASSWORD in .env. API will return 401 Unauthorized until configured.");
-}
 
 // ─────────────────────────────────────────────
 // Auth & Browser state
@@ -32,7 +26,7 @@ if (!SV_EMAIL || !SV_PASSWORD) {
 let browser: Browser | null = null;
 const sessions = new Map<string, { context: BrowserContext; page: Page; isLoggedIn: boolean; baseUrl: string }>();
 
-const PROJECTS_FILE = path.join(process.cwd(), '..', 'data', 'projects.json');
+const PROJECTS_FILE = path.resolve(__dirname, '..', '..', 'data', 'projects.json');
 function loadProjects() {
     if (fs.existsSync(PROJECTS_FILE)) {
         try {
@@ -420,8 +414,14 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         // ── LOGIN ─────────────────────────────────────────────────────────────
         if (name === "login") {
             const id = Array.from(sessions.keys())[0];
-            const email = (args.email as string) || SV_EMAIL!;
-            const password = (args.password as string) || SV_PASSWORD!;
+            if (!id) return err("No active project session found. Add a project first.");
+
+            const email = String(args.email || '').trim();
+            const password = String(args.password || '').trim();
+            if (!email || !password) {
+                return err("Both email and password are required for manual login.");
+            }
+
             const success = await performLogin(id, email, password);
             return ok({ status: success ? "Login successful" : "Login failed" });
         }

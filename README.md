@@ -6,7 +6,7 @@ A full-stack executive dashboard for the Chairman — built with React (Vite) on
 
 ## 🏗️ Project Structure
 
-```
+```text
 -Enterprise-Command-Center/
 ├── frontend/              ← React + Vite Chairman Dashboard (Blossom UI)
 │   ├── src/
@@ -26,7 +26,9 @@ A full-stack executive dashboard for the Chairman — built with React (Vite) on
 ---
 
 ## 🎨 Design System: Blossom UI
+
 The dashboard uses the **Blossom UI** aesthetic:
+
 - **Primary Accent**: Blossom Orange (`#D14931`)
 - **Theme**: Light/Neutral with a clean White sidebar.
 - **Typography**: Plus Jakarta Sans & Inter.
@@ -37,9 +39,11 @@ The dashboard uses the **Blossom UI** aesthetic:
 ## 🚀 Getting Started
 
 ### 1. Backend (MCP Server)
+
 The MCP (Model Context Protocol) server exposes live StartupVarsity admin data via Playwright browser automation.
 
 **Setup:**
+
 ```bash
 cd backend/mcp-server
 npm install
@@ -47,25 +51,33 @@ npx playwright install chromium
 ```
 
 **Configuration:**
+
 Create a `.env` file in `backend/mcp-server/`:
+
 ```env
-SV_EMAIL=your-admin@email.com
-SV_PASSWORD=your-password
+ANTHROPIC_API_KEY=your-anthropic-key
 ```
 
+`SV_EMAIL` and `SV_PASSWORD` are optional and only needed if you want automatic login flows.
+
 **Run:**
+
 ```bash
 npm run dev
 ```
 
 ### 2. Frontend
+
 **Setup & Run:**
+
 ```bash
 cd frontend
 npm install
 npm run dev
 ```
-Open → **http://localhost:5173**
+
+Open: [http://localhost:5173](http://localhost:5173)
+
 Login: `chairman` / `chairman@123`
 
 ---
@@ -73,7 +85,7 @@ Login: `chairman` / `chairman@123`
 ## 🛠️ Available MCP Tools (StartupVarsity)
 
 | Tool | Description |
-|------|-------------|
+| ------ | ------------- |
 | `get_dashboard_stats` | Total users, teams, learners, mentors, active cohorts |
 | `get_cohort_stats` | Sprint progress, team health breakdown |
 | `get_notifications` | All admin notifications |
@@ -88,6 +100,7 @@ Login: `chairman` / `chairman@123`
 ---
 
 ## 🛣️ Roadmap
+
 - [x] Implement Blossom UI redesign across all pages.
 - [x] Connect frontend to MCP server via Express API layer.
 - [ ] Implement persistent project management (dynamic connections).
