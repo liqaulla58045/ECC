@@ -9,12 +9,18 @@ import { errorHandler } from './middleware/errorHandler.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname  = path.dirname(__filename);
+
+function isValidFrontendDist(distPath: string): boolean {
+    return fs.existsSync(path.join(distPath, 'index.html')) && fs.existsSync(path.join(distPath, 'assets'));
+}
+
 const FRONTEND_DIST_CANDIDATES = [
     path.join(__dirname, 'public'),
+    path.resolve(process.cwd(), 'backend', 'api', 'dist', 'public'),
     path.resolve(__dirname, '..', '..', '..', 'frontend', 'dist'),
     path.resolve(process.cwd(), 'frontend', 'dist'),
 ];
-const FRONTEND_DIST = FRONTEND_DIST_CANDIDATES.find((p) => fs.existsSync(p)) || FRONTEND_DIST_CANDIDATES[0];
+const FRONTEND_DIST = FRONTEND_DIST_CANDIDATES.find((p) => isValidFrontendDist(p)) || FRONTEND_DIST_CANDIDATES[0];
 
 import authRouter          from './routes/auth.js';
 import usersRouter         from './routes/users.js';
@@ -54,17 +60,29 @@ app.use(express.json());
 
 // ─── Serve frontend in production ──────────────
 if (process.env.NODE_ENV === 'production') {
-    const distExists = fs.existsSync(FRONTEND_DIST);
+    const distExists = isValidFrontendDist(FRONTEND_DIST);
     console.log(`📦 Frontend dist candidates: ${FRONTEND_DIST_CANDIDATES.join(' | ')}`);
     console.log(`📦 Using frontend dist: ${FRONTEND_DIST} (exists: ${distExists})`);
     if (distExists) {
-        // Serve hashed Vite bundles with long caching. No fallthrough:false — if the
-        // assets dir is missing or a file not found, fall through to SPA handler (404)
-        // instead of propagating an ENOENT as a 500 JSON error that breaks asset loading.
-        app.use('/assets', express.static(path.join(FRONTEND_DIST, 'assets'), {
+        const assetsDir = path.join(FRONTEND_DIST, 'assets');
+        app.use('/assets', express.static(assetsDir, {
             immutable: true,
             maxAge: '1y',
+            fallthrough: true,
+            index: false,
         }));
+
+        // Force clean 404 for missing bundles instead of leaking to other middleware.
+        app.get('/assets/*', (req, res) => {
+            const assetRelPath = req.path.replace(/^\/assets\//, '');
+            const assetPath = path.join(assetsDir, assetRelPath);
+            if (!assetPath.startsWith(assetsDir) || !fs.existsSync(assetPath)) {
+                res.status(404).end();
+                return;
+            }
+            res.sendFile(assetPath);
+        });
+
         app.use(express.static(FRONTEND_DIST));
     }
 }
@@ -88,7 +106,7 @@ app.use('/',                  aiRouter);     // /claude, /openai
 
 // ─── SPA fallback (must be after all API routes) ─
 if (process.env.NODE_ENV === 'production') {
-    const distExists = fs.existsSync(FRONTEND_DIST);
+    const distExists = isValidFrontendDist(FRONTEND_DIST);
     // Only serve index.html for non-asset routes (let assets 404 cleanly)
     app.get('*', (req, res) => {
         if (/\.(js|css|ico|png|jpg|jpeg|svg|woff|woff2|ttf|map)$/.test(req.path)) {
@@ -99,6 +117,7 @@ if (process.env.NODE_ENV === 'production') {
             res.status(503).json({ error: 'Frontend not available', tried: FRONTEND_DIST_CANDIDATES });
             return;
         }
+        res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
         res.sendFile(path.join(FRONTEND_DIST, 'index.html'), (err) => {
             if (err) res.status(500).json({ error: 'Frontend not built', dist: FRONTEND_DIST });
         });
