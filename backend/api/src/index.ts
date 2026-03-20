@@ -58,9 +58,10 @@ if (process.env.NODE_ENV === 'production') {
     console.log(`📦 Frontend dist candidates: ${FRONTEND_DIST_CANDIDATES.join(' | ')}`);
     console.log(`📦 Using frontend dist: ${FRONTEND_DIST} (exists: ${distExists})`);
     if (distExists) {
-        // Serve hashed Vite bundles with strict 404 behavior and long caching.
+        // Serve hashed Vite bundles with long caching. No fallthrough:false — if the
+        // assets dir is missing or a file not found, fall through to SPA handler (404)
+        // instead of propagating an ENOENT as a 500 JSON error that breaks asset loading.
         app.use('/assets', express.static(path.join(FRONTEND_DIST, 'assets'), {
-            fallthrough: false,
             immutable: true,
             maxAge: '1y',
         }));
