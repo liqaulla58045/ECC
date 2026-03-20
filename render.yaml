@@ -64,8 +64,6 @@ services:
         value: https://ecc-api.onrender.com
       - key: MCP_SERVER_URL
         value: https://ecc-mcp.onrender.com
-      - key: ANTHROPIC_API_KEY
-        sync: false   # Set manually in Render dashboard
 
   # ── MCP browser-automation service ─────────────────────────────────────
   - type: web
@@ -79,5 +77,3 @@ services:
         value: production
       - key: PORT
         value: 10000
-      - key: ANTHROPIC_API_KEY
-        sync: false
