@@ -133,15 +133,22 @@ app.use(errorHandler);
 
 // ─── Boot ──────────────────────────────────────
 async function start() {
-    try {
-        await runMigrations();
-        app.listen(PORT, () => {
-            console.log(`✅ ECC API running on http://localhost:${PORT}`);
-            console.log(`   Docs: GET /health`);
-        });
-    } catch (err) {
-        console.error('❌ Failed to start server:', err);
-        process.exit(1);
+    const maxAttempts = 10;
+    for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+        try {
+            await runMigrations();
+            app.listen(PORT, () => {
+                console.log(`✅ ECC API running on http://localhost:${PORT}`);
+                console.log(`   Docs: GET /health`);
+            });
+            return;
+        } catch (err) {
+            console.error(`❌ Startup attempt ${attempt}/${maxAttempts} failed:`, err);
+            if (attempt === maxAttempts) {
+                process.exit(1);
+            }
+            await new Promise((resolve) => setTimeout(resolve, 5000));
+        }
     }
 }
 

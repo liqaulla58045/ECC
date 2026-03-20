@@ -611,7 +611,11 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
 // ─────────────────────────────────────────────
 // Start
 // ─────────────────────────────────────────────
-await initBrowser();
+try {
+    await initBrowser();
+} catch (e: any) {
+    console.error("⚠️ Browser initialization failed on startup. Service will run and retry when projects are added.", e?.message || e);
+}
 
 try {
     const transport = new StdioServerTransport();
