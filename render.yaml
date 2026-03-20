@@ -71,7 +71,7 @@ services:
   - type: web
     name: ecc-mcp
     runtime: node
-    plan: starter          # Free tier may timeout during Playwright install; use starter
+    plan: free
     buildCommand: cd backend/mcp-server && npm install && npm run build
     startCommand: node backend/mcp-server/dist/server.js
     envVars:
